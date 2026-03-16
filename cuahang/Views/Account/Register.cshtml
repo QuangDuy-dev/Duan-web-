@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h3>Đăng Ký Thành Viên</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Register" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Tên đăng nhập</label>
+                            <input type="text" name="username" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="" name="email" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu</label>
+                            <input type="password" name="password" class="form-control" required />
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Xác Nhận Đăng Ký</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (TempData["Error"] != null)
+    {
+                <script>
+                    Swal.fire('Lỗi', '@TempData["Error"]', 'error');
+                </script>
+    }
+}
