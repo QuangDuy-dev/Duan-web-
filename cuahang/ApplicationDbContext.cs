@@ -9,5 +9,8 @@ namespace cuahang
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<User> nguoidung { get; set; }
+        public DbSet<SanPham> SanPham { get; set; }
+        public DbSet<HoaDon> HoaDon { get; set; }
+        public DbSet<ChiTietHoaDon> ChiTietHoaDon { get; set; }
     }
 }
