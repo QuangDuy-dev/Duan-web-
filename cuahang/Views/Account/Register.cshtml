@@ -1,44 +1,50 @@
 ﻿@{
-    ViewData["Title"] = "Register";
+	ViewData["Title"] = "Register";
 }
 @{
-    Layout = null;
+	Layout = null;
 }
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <link rel="stylesheet" href="~/css/login.css" />
 
 <div class="container">
-    <div class="form-box active">
-        <form asp-action="Register" method="post">
-            <h2>Register</h2>
+	<div class="form-box active">
+		<form asp-action="Register" method="post">
+			<h2>Register</h2>
 
-            <input type="text" name="username" placeholder="Username" required />
-            <input type="email" name="email" placeholder="Email" required />
-            <input type="password" name="password" placeholder="Password" required />
-            <input type="password" name="confirmPassword" placeholder="Confirm Password" required />
+			<input type="text" name="username" placeholder="Username" required />
+			<input type="email" name="email" placeholder="Email" required />
+			<input type="password" name="password" placeholder="Password" required />
+			<input type="password" name="confirmPassword" placeholder="Confirm Password" required />
 
-            <button type="submit">Register</button>
+			<button type="submit">Register</button>
 
-            <p>
-                Already have an account?
-                <a asp-action="Login">Login</a>
-            </p>
-        </form>
-    </div>
+			<p>
+				Already have an account?
+				<a asp-action="Login">Login</a>
+			</p>
+		</form>
+	</div>
 </div>
 
-@section Scripts {
-    @if (TempData["Success"] != null)
-    {
-    <script>
-            Swal.fire('Thành công', '@TempData["Success"]', 'success');
-    </script>
-    }
-    @if (TempData["Error"] != null)
-    {
-    <script>
-            Swal.fire('Lỗi', '@TempData["Error"]', 'error');
-    </script>
-    }
+@if (TempData["Success"] != null)
+{
+	<script>
+		Swal.fire('Thành công', '@TempData["Success"]', 'success');
+	</script>
+}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if (TempData["Error"] != null)
+{
+	<script>
+		Swal.fire({
+			title: 'Lỗi!',
+			// Dùng Html.Raw để không bị lỗi font tiếng Việt
+			html: '@Html.Raw(TempData["Error"])',
+			icon: 'error',
+			confirmButtonText: 'Thử lại'
+		});
+	</script>
 }
