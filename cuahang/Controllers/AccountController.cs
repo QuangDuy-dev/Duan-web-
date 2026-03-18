@@ -46,10 +46,15 @@ namespace cuahang.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(string username, string password,string email)
+        public IActionResult Register(string username, string password,string email, string confirmPassword)
         {
             try
             {
+                if (password != confirmPassword)
+                {
+                    TempData["Error"] = "Mật khẩu xác nhận không khớp. Vui lòng thử lại!";
+                    return View(); 
+                }
                 // 1. Kiểm tra xem tên đăng nhập đã tồn tại chưa (Tùy chọn nhưng nên làm)
                 var existingUser = _context.nguoidung.FirstOrDefault(u => u.Name == username);
                 if (existingUser != null)
