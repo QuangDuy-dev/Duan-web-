@@ -25,17 +25,30 @@
     </div>
 </div>
 
-@section Scripts {
-    @if (TempData["Success"] != null)
-    {
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@if (TempData["Success"] != null)
+{
     <script>
-            Swal.fire('OK', '@TempData["Success"]', 'success');
+        Swal.fire({
+            title: 'SUCCESS!',
+            html: '@Html.Raw(TempData["Success"])',
+            text: '@TempData["Success"]',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
     </script>
-    }
 }
+
 @if (TempData["Error"] != null)
 {
-<script>
-    Swal.fire('Lỗi', '@TempData["Error"]', 'error');
-</script>
+    <script>
+        Swal.fire({
+            title: 'ERROR!',
+            text: '@TempData["Error"]',
+            html: '@Html.Raw(TempData["Error"])',
+            icon: 'error',
+            confirmButtonText: 'Thử lại'
+        });
+    </script>
 }

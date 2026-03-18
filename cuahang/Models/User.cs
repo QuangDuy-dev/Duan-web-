@@ -1,5 +1,7 @@
-﻿namespace cuahang.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+namespace cuahang.Models
 {
+    [Table("nguoidung")]
     public class User
     {
         public int Id { get; set; }
