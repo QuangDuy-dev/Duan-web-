@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using cuahang.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace cuahang.Controllers
 {
@@ -13,13 +14,21 @@ namespace cuahang.Controllers
             return View();
         }
 
+        public IActionResult Logout()
+        {
+            HttpContext.Session.SetInt32("UserId", 0);
+            HttpContext.Session.SetString("UserName", null);
+            HttpContext.Session.SetString("UserEmail", null);
+            return RedirectToAction("Index", "Home");
+        }
+
         private readonly ApplicationDbContext _context;
 
         public AccountController(ApplicationDbContext context)
         {
             _context = context;
         }
-
+        
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
@@ -29,6 +38,10 @@ namespace cuahang.Controllers
 
             if (user != null)
             {
+                // LƯU BIẾN TOÀN CỤC (Session)
+                HttpContext.Session.SetInt32("UserId", user.Id);
+                HttpContext.Session.SetString("UserName", user.Name);
+                HttpContext.Session.SetString("UserEmail", user.Email);
                 // Nếu tìm thấy, chuyển hướng sang trang chủ
                 return RedirectToAction("Index", "Home");
             }

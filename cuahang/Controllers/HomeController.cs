@@ -12,6 +12,8 @@ namespace cuahang.Controllers
 
         
 
+        
+
         public IActionResult Index()
         {
             if (!_db.SanPham.Any()) // khi ko có sản phẩm
