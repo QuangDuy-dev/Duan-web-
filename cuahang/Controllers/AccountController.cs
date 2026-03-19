@@ -16,10 +16,9 @@ namespace cuahang.Controllers
 
         public IActionResult Logout()
         {
-            HttpContext.Session.SetInt32("UserId", 0);
-            HttpContext.Session.SetString("UserName", null);
-            HttpContext.Session.SetString("UserEmail", null);
-            return RedirectToAction("Index", "Home");
+            HttpContext.Session.Clear(); // Xóa sạch các biến toàn cục
+            return RedirectToAction("index","home");
+
         }
 
         private readonly ApplicationDbContext _context;
