@@ -1,6 +1,6 @@
 ﻿using cuahang.Models;
 using Microsoft.AspNetCore.Mvc;
-
+//test chuc nang
 namespace cuahang.Controllers
 {
     public class AccountController : Controller
