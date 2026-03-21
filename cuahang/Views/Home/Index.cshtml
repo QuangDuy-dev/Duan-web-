@@ -3,11 +3,33 @@
 
 @if (Model == null || !Model.Any())
 {
-    <div class="alert alert-info">Hiện chưa có sản phẩm nào trong cửa hàng!</div>
+    if (!string.IsNullOrEmpty(Context.Request.Query["keyword"]))
+    {
+        <div class="alert alert-warning text-center">
+            Không tìm thấy sản phẩm phù hợp!
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            Hiện chưa có sản phẩm nào trong cửa hàng!
+        </div>
+    }
 }
 
 <div class="container mt-5">
     <h2 class="text-center mb-4 text-uppercase fw-bold text-primary">Cửa Hàng Trực Tuyến</h2>
+    @{
+        var keyword = Context.Request.Query["keyword"];
+    }
+
+    @if (!string.IsNullOrEmpty(keyword))
+    {
+        <p class="text-center">
+            Kết quả tìm kiếm cho:
+            <strong class="text-danger">@keyword</strong>
+        </p>
+    }
     <div class="row">
         @foreach (var item in Model)
         {
