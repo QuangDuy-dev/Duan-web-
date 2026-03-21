@@ -1,6 +1,7 @@
-﻿using cuahang.Models;
+﻿using System.Diagnostics;
+using cuahang.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace cuahang.Controllers
 {
@@ -10,27 +11,39 @@ namespace cuahang.Controllers
         private readonly ApplicationDbContext _db;
         public HomeController(ApplicationDbContext db) { _db = db; }
 
-        
-
-        
-
-        public IActionResult Index()
+        public IActionResult Index(string keyword)
         {
-            if (!_db.SanPham.Any()) // khi ko có sản phẩm
+            var dsSanPham = _db.SanPham.AsQueryable();
+
+            if (!string.IsNullOrEmpty(keyword))
             {
-                _db.SanPham.Add(new SanPham
-                {
-                    TenSP = "iPhone 15 Pro",
-                    Gia = 25000000,
-                    HinhAnh = "0",
-                    MoTa = "Điện thoại cao cấp",
-                    SoLuongTon = 1,
-                    ImageUrl="iphone.webp"
-                });
+                dsSanPham = dsSanPham.Where(p => p.TenSP.Contains(keyword));
+            }
+
+            if (!_db.SanPham.Any())
+            {
+                _db.SanPham.AddRange(
+                    new SanPham
+                    {
+                        TenSP = "iPhone 15 Pro",
+                        Gia = 25000000,
+                        ImageUrl = "iphone.webp",
+                        MoTa = "Điện thoại cao cấp",
+                        SoLuongTon = 1
+                    },
+                    new SanPham
+                    {
+                        TenSP = "Samsung Galaxy S26 Ultra",
+                        Gia = 30000000,
+                        ImageUrl = "s26_ultra.webp",
+                        MoTa = "Điện thoại cao cấp",
+                        SoLuongTon = 1
+                    }
+                );
                 _db.SaveChanges();
             }
-            var dsSanPham = _db.SanPham.ToList();
-            return View(dsSanPham);
+
+            return View(dsSanPham.ToList());
         }
 
         public IActionResult Privacy()
