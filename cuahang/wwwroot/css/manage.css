@@ -1,11 +1,9 @@
-﻿/* RESET */
-body {
+﻿body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* TOPBAR */
 .topbar {
     height: 60px;
     background: #212529;
@@ -20,7 +18,6 @@ body {
     padding: 0 15px;
 }
 
-/* SIDEBAR */
 .sidebar {
     position: fixed;
     top: 60px;
@@ -32,51 +29,46 @@ body {
     overflow: hidden;
 }
 
-    /* SIDEBAR LINK */
     .sidebar a {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0;
-        color: #adb5bd; /* 🔥 thêm dòng này */
-        text-decoration: none; /* 🔥 bỏ gạch chân */
+        color: #adb5bd;
+        text-decoration: none;
     }
         .sidebar a:hover {
             background: #495057;
             color: #fff;
         }
-    /* ICON */
     .sidebar i {
         font-size: 18px;
     }
 
-    /* TEXT (ANIMATION MƯỢT) */
     .sidebar span {
-        position: absolute; /* 🔥 tránh ảnh hưởng layout */
+        position: absolute;
         left: 60px;
         opacity: 0;
         transform: translateX(-10px);
         transition: all 0.25s ease;
     }
 
-    /* HOVER SIDEBAR */
     .sidebar:hover {
         width: 180px;
     }
 
         .sidebar:hover a {
             justify-content: flex-start;
-            gap: 10px; /* 🔥 tạo khoảng cách icon + chữ */
+            gap: 10px;
             padding-left: 15px;
         }
 
         .sidebar:hover span {
-            position: static; /* trở lại bình thường */
+            position: static;
             opacity: 1;
             transform: translateX(0);
         }
 
-/* CONTENT */
 .content {
     margin-left: 70px;
     margin-top: 60px;
@@ -86,7 +78,6 @@ body {
     transition: all 0.3s ease;
 }
 
-/* FOOTER */
 .footer {
     margin-left: 70px;
     width: calc(100% - 70px);
@@ -96,7 +87,6 @@ body {
     transition: all 0.3s ease;
 }
 
-/* HOVER EFFECT */
 .sidebar:hover ~ .content {
     margin-left: 220px;
     width: calc(100% - 220px);
@@ -107,7 +97,6 @@ body {
     width: calc(100% - 220px);
 }
 
-/* CARD FIX */
 .card {
     width: 100%;
 }
