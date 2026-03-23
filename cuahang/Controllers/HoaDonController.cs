@@ -22,6 +22,11 @@ namespace cuahang.Controllers
             return View(orders);
         }
 
+        public IActionResult Cart()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveOrder([FromBody] HoaDon model)
         {
