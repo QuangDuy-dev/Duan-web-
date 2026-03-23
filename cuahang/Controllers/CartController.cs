@@ -7,28 +7,24 @@ using System.Linq;
 
 namespace cuahang.Controllers
 {
-    public class CartController : Controller
+    
+    public class CartController(ApplicationDbContext context) : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context = context;
 
-        public CartController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        // 1. Lấy số lượng tổng để cập nhật Badge trên Header
-        [HttpGet]
+       
         public IActionResult GetCartCount()
         {
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? new List<CartItem>();
+            
+            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             return Json(new { count = cart.Sum(x => x.SoLuong) });
         }
 
-        // 2. HOÀN THIỆN: Cập nhật số lượng và trả về dữ liệu tính toán mới
         [HttpPost]
         public IActionResult UpdateQuantity(int id, int quantity)
         {
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? new List<CartItem>();
+            
+            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             var item = cart.FirstOrDefault(p => p.SanPhamId == id);
 
             if (item != null)
@@ -39,21 +35,18 @@ namespace cuahang.Controllers
                 }
                 else
                 {
-                    // Nếu số lượng về 0 hoặc nhỏ hơn, có thể xóa khỏi giỏ hoặc giữ tối thiểu là 1
                     item.SoLuong = 1;
                 }
 
-                // Lưu lại danh sách đã cập nhật vào Session
                 HttpContext.Session.SetJson("GioHang", cart);
             }
 
-            // Tính toán lại các con số để trả về cho giao diện AJAX cập nhật ngay lập tức
             return Json(new
             {
                 success = true,
-                totalItemPrice = item?.ThanhTien.ToString("N0"), // Tổng tiền của riêng sản phẩm này
-                grandTotal = cart.Sum(x => x.ThanhTien).ToString("N0"), // Tổng cộng cả giỏ hàng
-                cartCount = cart.Sum(x => x.SoLuong) // Tổng số lượng sản phẩm để cập nhật Badge
+                totalItemPrice = item?.ThanhTien.ToString("N0"),
+                grandTotal = cart.Sum(x => x.ThanhTien).ToString("N0"),
+                cartCount = cart.Sum(x => x.SoLuong)
             });
         }
 
@@ -61,7 +54,8 @@ namespace cuahang.Controllers
         [HttpPost]
         public IActionResult AddToCart(int id)
         {
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? new List<CartItem>();
+           
+            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             var item = cart.FirstOrDefault(p => p.SanPhamId == id);
 
             if (item != null)
@@ -70,7 +64,6 @@ namespace cuahang.Controllers
             }
             else
             {
-                // Lưu ý: Đổi thành _context.SanPhams nếu bạn đã sửa tên bảng trong DbContext
                 var product = _context.SanPham.Find(id);
 
                 if (product == null)
@@ -101,7 +94,8 @@ namespace cuahang.Controllers
         // 4. Trang danh sách giỏ hàng
         public IActionResult Index()
         {
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? new List<CartItem>();
+            
+            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             ViewBag.TongTien = cart.Sum(s => s.ThanhTien);
             return View(cart);
         }
@@ -110,7 +104,8 @@ namespace cuahang.Controllers
         [HttpPost]
         public IActionResult RemoveFromCart(int id)
         {
-            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? new List<CartItem>();
+           
+            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             var item = cart.FirstOrDefault(p => p.SanPhamId == id);
 
             if (item != null)
@@ -120,6 +115,64 @@ namespace cuahang.Controllers
             }
 
             return Json(new { success = true, count = cart.Sum(x => x.SoLuong) });
+        }
+
+        // 6. Action xử lý tính toán Voucher và hiển thị trang xác nhận thanh toán
+        [HttpGet]
+        public IActionResult Checkout()
+        {
+            
+            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
+
+            if (!cart.Any())
+            {
+                return RedirectToAction("Index");
+            }
+
+            decimal tongTienHang = cart.Sum(x => x.ThanhTien);
+            decimal voucherGiam = 0;
+            int phanTramGiam = 0;
+
+            if (tongTienHang > 100000000)
+            {
+                phanTramGiam = 35;
+            }
+            else if (tongTienHang > 70000000)
+            {
+                phanTramGiam = 25;
+            }
+            else if (tongTienHang > 50000000)
+            {
+                phanTramGiam = 15;
+            }
+
+            voucherGiam = tongTienHang * phanTramGiam / 100;
+
+            ViewBag.TongTienHang = tongTienHang;
+            ViewBag.VoucherGiam = voucherGiam;
+            ViewBag.PhanTramGiam = phanTramGiam;
+            ViewBag.TongThanhToan = tongTienHang - voucherGiam;
+
+            return View(cart);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmOrder(string DiaChi, string SoDienThoai)
+        {
+            if (string.IsNullOrEmpty(DiaChi) || string.IsNullOrEmpty(SoDienThoai))
+            {
+                return RedirectToAction("Checkout");
+            }
+
+            HttpContext.Session.Remove("GioHang");
+
+            return RedirectToAction("OrderSuccess");
+        }
+
+        public IActionResult OrderSuccess()
+        {
+            ViewBag.UserName = HttpContext.Session.GetString("UserName") ?? "Quý khách";
+            return View();
         }
     }
 }
