@@ -8,46 +8,48 @@
     <i class="bi bi-box-seam"></i> Quản lý sản phẩm
 </h3>
 
-<div class="input-group mb-3">
-    <span class="input-group-text">
-        <i class="bi bi-search"></i>
-    </span>
-    <input type="text" id="searchBox" class="form-control" placeholder="Tìm sản phẩm" />
-</div>
-
 <div class="card mb-4 shadow-sm">
     <div class="card-header bg-primary text-white">
         Thêm sản phẩm
     </div>
     <div class="card-body">
-        <form asp-action="Create" method="post" class="row g-2">
+        <form asp-action="Create" method="post" class="row g-3">
 
-            <div class="col-md-3">
+            <div class="col-12">
                 <input name="TenSP" class="form-control" placeholder="Tên sản phẩm" required />
             </div>
 
-            <div class="col-md-2">
+            <div class="col-12">
                 <input name="Gia" type="number" class="form-control" placeholder="Giá" required />
             </div>
 
-            <div class="col-md-2">
+            <div class="col-12">
                 <input name="SoLuongTon" type="number" class="form-control" placeholder="Số lượng" required />
             </div>
 
-            <div class="col-md-2">
+            <div class="col-12">
                 <input name="ImageUrl" class="form-control" placeholder="Tên ảnh" />
             </div>
 
-            <div class="col-md-2">
+            <div class="col-12">
                 <input name="MoTa" class="form-control" placeholder="Mô tả" />
             </div>
 
-            <button class="btn btn-success w-100">
-                <i class="bi bi-plus-lg"></i>
-            </button>
+            <div class="col-12">
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="bi bi-plus-lg"></i> Thêm sản phẩm
+                </button>
+            </div>
 
         </form>
     </div>
+</div>
+
+<div class="input-group mb-3">
+    <span class="input-group-text">
+        <i class="bi bi-search"></i>
+    </span>
+    <input type="text" id="searchBox" class="form-control" placeholder="Tìm sản phẩm" />
 </div>
 
 <table class="table table-bordered table-hover shadow-sm" id="productTable">
