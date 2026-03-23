@@ -1,0 +1,113 @@
+﻿@model IEnumerable<cuahang.Models.SanPham>
+@{
+    ViewBag.Title = "Quản lý sản phẩm";
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+}
+
+<h3 class="mb-4">
+    <i class="bi bi-box-seam"></i> Quản lý sản phẩm
+</h3>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white">
+        Thêm sản phẩm
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post" class="row g-3">
+
+            <div class="col-12">
+                <input name="TenSP" class="form-control" placeholder="Tên sản phẩm" required />
+            </div>
+
+            <div class="col-12">
+                <input name="Gia" type="number" class="form-control" placeholder="Giá" required />
+            </div>
+
+            <div class="col-12">
+                <input name="SoLuongTon" type="number" class="form-control" placeholder="Số lượng" required />
+            </div>
+
+            <div class="col-12">
+                <input name="ImageUrl" class="form-control" placeholder="Tên ảnh" />
+            </div>
+
+            <div class="col-12">
+                <input name="MoTa" class="form-control" placeholder="Mô tả" />
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="bi bi-plus-lg"></i> Thêm sản phẩm
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="input-group mb-3">
+    <span class="input-group-text">
+        <i class="bi bi-search"></i>
+    </span>
+    <input type="text" id="searchBox" class="form-control" placeholder="Tìm sản phẩm" />
+</div>
+
+<table class="table table-bordered table-hover shadow-sm" id="productTable">
+    <thead class="table-dark text-center">
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>SL</th>
+            <th>Ảnh</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var sp in Model)
+        {
+            <tr class="text-center">
+                <td>@sp.Id</td>
+
+                <td class="ten">@sp.TenSP</td>
+
+                <td>@sp.Gia.ToString("N0")</td>
+
+                <td>@sp.SoLuongTon</td>
+
+                <td>
+                    <img src="~/image/@sp.ImageUrl" class="product-img" />
+                </td>
+
+                <td>
+                    <a asp-action="Details" asp-route-id="@sp.Id" class="btn btn-info btn-sm">
+                        <i class="bi bi-eye"></i>
+                    </a>
+
+                    <a asp-action="Delete" asp-route-id="@sp.Id" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Xóa sản phẩm này?')">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            $("#searchBox").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+
+                $("#productTable tbody tr").filter(function () {
+                    $(this).toggle($(this).find(".ten").text().toLowerCase().includes(value));
+                });
+
+            });
+
+        });
+    </script>
+}

@@ -1,45 +1,71 @@
 ﻿@model IEnumerable<cuahang.Models.SanPham>
 
+@{
+    var keyword = Context.Request.Query["keyword"];
+    var userLevel = Context.Session.GetString("UserLevel");
+}
+
+@if (userLevel == "2")
+{
+    <div class="text-end mb-3">
+        <a href="/Manage/Manage" class="btn btn-warning shadow-sm">
+            <i class="bi bi-gear"></i> Manage
+        </a>
+    </div>
+}
 
 @if (Model == null || !Model.Any())
 {
-    <div class="alert alert-info">Hiện chưa có sản phẩm nào trong cửa hàng!</div>
+    if (!string.IsNullOrEmpty(keyword))
+    {
+        <div class="alert alert-warning text-center">
+            Không tìm thấy sản phẩm phù hợp!
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            Hiện chưa có sản phẩm nào trong cửa hàng!
+        </div>
+    }
 }
 
 <div class="container mt-5">
     <h2 class="text-center mb-4 text-uppercase fw-bold text-primary">Cửa Hàng Trực Tuyến</h2>
+
+    @if (!string.IsNullOrEmpty(keyword))
+    {
+        <p class="text-center">
+            Kết quả tìm kiếm cho:
+            <strong class="text-danger">@keyword</strong>
+        </p>
+    }
+    
     <div class="row">
         @foreach (var item in Model)
         {
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="text-center p-3">
-                            <img src="~/image/@item.ImageUrl" 
-                                 class="card-img-top img-fluid" 
-                                 style="max-height: 200px; object-fit: contain;" 
-                                 alt="@item.TenSP"
-                                 onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
-                        </div>
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="text-center p-3">
+                        <img src="~/image/@item.ImageUrl" 
+                             class="card-img-top img-fluid" 
+                             style="max-height: 200px; object-fit: contain;" 
+                             alt="@item.TenSP"
+                             onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                    </div>
 
-                        <div class="card-body d-flex flex-column text-center">
-                            <h5 class="card-title fw-bold">@item.TenSP</h5>
-                            <p class="card-text text-muted small">@item.MoTa</p>
-                            <div class="mt-auto">
-                                <h5 class="text-danger">@item.Gia.ToString("N0") <span class="small">VNĐ</span></h5>
-                                <button class="btn btn-primary w-100 mt-2 shadow-sm">
-                                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ
-                                </button>
-                            </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h5 class="card-title fw-bold">@item.TenSP</h5>
+                        <p class="card-text text-muted small">@item.MoTa</p>
+                        <div class="mt-auto">
+                            <h5 class="text-danger">@item.Gia.ToString("N0") <span class="small">VNĐ</span></h5>
+                            <button class="btn btn-primary w-100 mt-2 shadow-sm">
+                                <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
         }
     </div>
 </div>
-
-<style>
-    .card:hover {
-        transform: translateY(-5px);
-        transition: 0.3s;
-    }
-</style>

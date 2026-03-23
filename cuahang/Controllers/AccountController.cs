@@ -41,6 +41,8 @@ namespace cuahang.Controllers
                 HttpContext.Session.SetInt32("UserId", user.Id);
                 HttpContext.Session.SetString("UserName", user.Name);
                 HttpContext.Session.SetString("UserEmail", user.Email);
+                // KIEM TRA QUYỀN (lvID) ĐỂ PHÂN QUYỀN TRONG ỨNG DỤNG
+                HttpContext.Session.SetString("UserLevel", user.lvID ?? "1");
                 // Nếu tìm thấy, chuyển hướng sang trang chủ
                 return RedirectToAction("Index", "Home");
             }

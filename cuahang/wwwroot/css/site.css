@@ -20,3 +20,15 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.card:hover {
+    transform: translateY(-5px);
+    transition: 0.3s;
+}
+
+.manage-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
