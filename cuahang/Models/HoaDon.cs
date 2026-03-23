@@ -4,7 +4,7 @@ namespace cuahang.Models
 {
     public class HoaDon
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public DateTime NgayDat { get; set; } = DateTime.Now;
         public decimal TongTien { get; set; }
         public string TrangThai { get; set; } = "Pending";

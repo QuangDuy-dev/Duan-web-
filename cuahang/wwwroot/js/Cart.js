@@ -99,20 +99,65 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('itemName').focus();
     }
     
-    function generateReceipt() {
+    async function generateReceipt() {
         updateReceiptPreview();
+
+        // 2. Prepare data for the Database
+    const totalAmount = parseFloat(document.getElementById('previewTotal').textContent);
+    
+    const orderData = {
+        Id: currentReceiptId, 
+        UserId: parseInt(currentUserId),
+        TongTien: totalAmount,
+        TrangThai: "Confirmed",
+        NgayDat: new Date().toISOString(),
+        ChiTietHoaDons: items.map(item => ({
+            SoLuong: item.quantity,
+            DonGia: item.price,
+            // Mapping to a 10-digit int to prevent SQL overflow from Date.now()
+            SanPhamId: parseInt(item.id.toString().substring(0, 9)) 
+        }))
+    };
+
+        // 3. Send to Controller (HoaDonController/SaveOrder)
+        try {
+            const response = await fetch('/HoaDon/SaveOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+                });
+
+            const result = await response.json();
+            if (result.success) {
+                alert('Thành công! Đơn hàng đã được lưu vào hệ thống.');
+                // Optional: clearAll(); // Clear the UI after successful save
+            } else {
+                alert('Lỗi: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            alert('Không thể kết nối đến máy chủ.');
+        }
     }
     
     function updateReceiptPreview() {
+        const userId = "1"; // Placeholder
+        const now = new Date();
+        const datePart = now.toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD
+        const timePart = now.getHours().toString().padStart(2, '0') + 
+                         now.getMinutes().toString().padStart(2, '0');
+        const uniqueReceiptId = `${userId}${datePart}${timePart}`;
+
         // Update business info
-        document.getElementById('previewBusinessAddress').textContent = 
-            document.getElementById('businessAddress').value || '123 Business St, City, State 12345';
-        document.getElementById('previewBusinessPhone').textContent = 
-            document.getElementById('businessPhone').value || '(123) 456-7890';
+        document.getElementById('previewcusAddress').textContent = 
+            document.getElementById('cusAddress').value || '123 Business St, City, State 12345';
+        document.getElementById('previewcusPhone').textContent = 
+            document.getElementById('cusPhone').value || '(123) 456-7890';
         
         // Update receipt details
-        document.getElementById('previewReceiptNumber').textContent = 
-            document.getElementById('receiptNumber').value || 'RCPT-001';
+        document.getElementById('previewReceiptNumber').textContent = uniqueReceiptId;
         document.getElementById('previewCustomerName').textContent = 
             document.getElementById('customerName').value || 'Customer Name';
         document.getElementById('previewPaymentMethod').textContent = 
@@ -125,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
             previewItems.innerHTML = `
                 <tr>
                     <td colspan="4" style="text-align: center; padding: 20px;">
-                        No items added
+                        Hiện chưa có sản phẩm trong giỏ hàng
                     </td>
                 </tr>
             `;
@@ -169,8 +214,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearAll() {
         if (confirm('Are you sure you want to clear all data?')) {
             items = [];
-            document.getElementById('businessAddress').value = '';
-            document.getElementById('businessPhone').value = '';
+            document.getElementById('cusAddress').value = '';
+            document.getElementById('cusPhone').value = '';
             document.getElementById('receiptNumber').value = '';
             document.getElementById('customerName').value = '';
             document.getElementById('paymentMethod').value = 'Cash';
@@ -182,24 +227,11 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('receiptData');
         }
     }
-    
-    function applyTemplate(template) {
-        // In a real app, this would apply different CSS styles
-        const receipt = document.getElementById('receiptPreview');
         
-        // Reset all template classes
-        receipt.className = 'receipt';
-        
-        // Add template-specific class
-        if (template !== 'default') {
-            receipt.classList.add(`template-${template}`);
-        }
-    }
-    
     function saveData() {
         const data = {
-            businessAddress: document.getElementById('businessAddress').value,
-            businessPhone: document.getElementById('businessPhone').value,
+            cusAddress: document.getElementById('cusAddress').value,
+            cusPhone: document.getElementById('cusPhone').value,
             receiptNumber: document.getElementById('receiptNumber').value,
             customerName: document.getElementById('customerName').value,
             paymentMethod: document.getElementById('paymentMethod').value,
@@ -217,8 +249,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (savedData) {
             const data = JSON.parse(savedData);
         
-            document.getElementById('businessAddress').value = data.businessAddress || '';
-            document.getElementById('businessPhone').value = data.businessPhone || '';
+            document.getElementById('cusAddress').value = data.cusAddress || '';
+            document.getElementById('cusPhone').value = data.cusPhone || '';
             document.getElementById('receiptNumber').value = data.receiptNumber || '';
             document.getElementById('customerName').value = data.customerName || '';
             document.getElementById('paymentMethod').value = data.paymentMethod || 'Cash';

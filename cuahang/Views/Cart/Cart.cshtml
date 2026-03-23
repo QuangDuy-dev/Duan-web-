@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đơn hàng</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="~/css/Cart.css" />
 </head>
 <body>
     <div class="container">
@@ -21,17 +21,17 @@
                 
                 <div class="form-group">
                     <label for="customerName">Tên người nhận:</label>
-                    <input type="text" id="customerName" placeholder="Enter customer name">
+                    <input type="text" id="customerName" placeholder="Nhập tên người nhận">
                 </div>
 
                 <div class="form-group">
-                    <label for="businessAddress">Địa chỉ giao hàng:</label>
-                    <textarea id="businessAddress" rows="2" placeholder="Enter business address"></textarea>
+                    <label for="cusAddress">Địa chỉ giao hàng:</label>
+                    <textarea id="cusAddress" rows="2" placeholder="Nhập địa chỉ giao hàng"></textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label for="businessPhone">Số điện thoại liên hệ:</label>
-                    <input type="text" id="businessPhone" placeholder="Enter business phone">
+                    <label for="cusPhone">Số điện thoại liên hệ:</label>
+                    <input type="text" id="cusPhone" placeholder="Enter business phone">
                 </div>
                 
                 <div class="form-group">
@@ -107,8 +107,8 @@
                 <div class="receipt" id="receiptPreview">
                     <div class="receipt-header">
                         <h2 id="previewBusinessName">Business Name</h2>
-                        <p id="previewBusinessAddress">Địa chỉ khách hàng</p>
-                        <p id="previewBusinessPhone">Số điện thoại</p>
+                        <p id="previewcusAddress">Địa chỉ khách hàng</p>
+                        <p id="previewcusPhone">Số điện thoại</p>
                     </div>
                     
                     <div class="receipt-body">
@@ -179,6 +179,6 @@
         </div>
     </div>
 
-    <script src="./script.js"></script>
+    <script src="./js/Cart.js"></script>
 </body>
 </html>

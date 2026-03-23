@@ -10,7 +10,7 @@ namespace cuahang.Models
 
         [ForeignKey("HoaDon")]
         // Liên kết tới HoaDon
-        public int HoaDonId { get; set; }
+        public string HoaDonId { get; set; }
         public virtual HoaDon HoaDon { get; set; }
 
         [ForeignKey("SanPham")]
