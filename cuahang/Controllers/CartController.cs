@@ -54,6 +54,10 @@ namespace cuahang.Controllers
         [HttpPost]
         public IActionResult AddToCart(int id)
         {
+            if(HttpContext.Session.Id==null)
+            {
+                //popup ko có tài khoản -> đâng nhập 
+            }
            
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             var item = cart.FirstOrDefault(p => p.SanPhamId == id);
@@ -92,7 +96,7 @@ namespace cuahang.Controllers
         }
 
         // 4. Trang danh sách giỏ hàng
-        public IActionResult Index()
+        public IActionResult Index() // đổi lại tên (danh sách hàng) 
         {
             
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
