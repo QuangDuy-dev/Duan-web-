@@ -1,7 +1,11 @@
+
 ﻿using BCrypt.Net;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
 using MailKit.Net.Smtp;
+
+﻿using cuahang.Models;
+
 
 namespace cuahang.Controllers
 {
@@ -16,13 +20,20 @@ namespace cuahang.Controllers
             return View();
         }
 
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear(); // Xóa sạch các biến toàn cục
+            return RedirectToAction("index","home");
+
+        }
+
         private readonly ApplicationDbContext _context;
 
         public AccountController(ApplicationDbContext context)
         {
             _context = context;
         }
-
+        
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
@@ -31,6 +42,12 @@ namespace cuahang.Controllers
 
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
+                // LƯU BIẾN TOÀN CỤC (Session)
+                HttpContext.Session.SetInt32("UserId", user.Id);
+                HttpContext.Session.SetString("UserName", user.Name);
+                HttpContext.Session.SetString("UserEmail", user.Email);
+                // KIEM TRA QUYỀN (lvID) ĐỂ PHÂN QUYỀN TRONG ỨNG DỤNG
+                HttpContext.Session.SetString("UserLevel", user.lvID ?? "1");
                 // Nếu tìm thấy, chuyển hướng sang trang chủ
                 return RedirectToAction("Index", "Home");
             }
@@ -200,3 +217,4 @@ namespace cuahang.Controllers
         }
     }
 }
+
