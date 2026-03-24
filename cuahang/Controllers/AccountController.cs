@@ -1,5 +1,11 @@
-﻿using cuahang.Models;
+
+﻿using BCrypt.Net;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
+using MailKit.Net.Smtp;
+
+﻿using cuahang.Models;
+
 
 namespace cuahang.Controllers
 {
@@ -32,10 +38,9 @@ namespace cuahang.Controllers
         public IActionResult Login(string username, string password)
         {
             // Sử dụng LINQ để tìm người dùng trong DB Online
-            var user = _context.nguoidung
-                               .FirstOrDefault(u => u.Name == username && u.Password == password);
+            var user = _context.nguoidung.FirstOrDefault(u => u.Name == username);
 
-            if (user != null)
+            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
                 // LƯU BIẾN TOÀN CỤC (Session)
                 HttpContext.Session.SetInt32("UserId", user.Id);
@@ -81,9 +86,9 @@ namespace cuahang.Controllers
                 var newUser = new Models.User
                 {
                     Name = username,
-                    Password = password,
+                    Password = BCrypt.Net.BCrypt.HashPassword(password),
                     Email = email, 
-                    OTP = "0",                // Gán mặc định
+                    OTP = "0",                
                     lvID = "1"
                 };
 
@@ -101,7 +106,115 @@ namespace cuahang.Controllers
                 return View();
             }
         }
+        // Trang quên mật khẩu 
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+        
+        [HttpPost]
+        public IActionResult SendOTP(string email)
+        {
+            var user = _context.nguoidung.FirstOrDefault(u => u.Email == email);
+            if (user != null)
+            {
+                // 1. Tạo mã OTP
+                string otp = new Random().Next(100000, 999999).ToString();
+                user.OTP = otp;
+                _context.SaveChanges();
+
+                try
+                {
+                    // 2. Cấu hình nội dung Email
+                    var message = new MimeMessage();
+                    message.From.Add(new MailboxAddress("Hệ thống Web", "giakietngo2812@gmail.com"));
+                    message.To.Add(new MailboxAddress("", email));
+                    message.Subject = "Mã xác thực OTP Reset Password";
+                    message.Body = new TextPart("plain")
+                    {
+                        Text = $"Mã xác thực của bạn là: {otp}. Vui lòng không cung cấp mã này cho bất kỳ ai."
+                    };
+
+                    // 3. Gửi Email qua SMTP của Gmail
+                    using (var client = new SmtpClient())
+                    {
+                        client.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+
+                        client.Authenticate("giakietngo2812@gmail.com", "xzyp lecl upsj nawu");
+
+                        client.Send(message);
+                        client.Disconnect(true);
+                    }
+                    return Ok(); 
+                }
+                catch (Exception ex)
+                {
+                  
+                    return StatusCode(500, ex.Message);
+                }
+            }
+            return BadRequest();
+        }
+        
+        [HttpGet]
+        public IActionResult ChangePassWord(string email)
+        {
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("ForgotPassword");
+
+            ViewBag.Email = email;
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult VerifyOTP(string email, string otp)
+        {
+            var user = _context.nguoidung.FirstOrDefault(u => u.Email == email && u.OTP == otp);
+
+            if (user != null)
+            {
+                TempData["Success"] = "Xác thực OTP thành công!";
+                return RedirectToAction("ChangePassword", new { email = email });
+            }
+            TempData["Error"] = "Mã OTP không chính xác. Vui lòng kiểm tra lại!";
+
+            ViewBag.Email = email;
+
+            return View("ForgotPassword");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ConfirmChangePassword(string email, string newPassword, string confirmPassword)
+        {
+            // 1. Kiểm tra mật khẩu có khớp nhau không
+            if (newPassword != confirmPassword)
+            {
+                TempData["Error"] = "Mật khẩu xác nhận không khớp!";
+                ViewBag.Email = email; 
+                return View("ChangePassWord"); 
+            }
+
+            // 2. Tìm người dùng trong database theo Email
+            var user = _context.nguoidung.FirstOrDefault(u => u.Email == email);
+
+            if (user != null)
+            {
+                // 3. Băm mật khẩu mới bằng BCrypt trước khi lưu
+                user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+                // 4. Reset mã OTP về 0 để không dùng lại được nữa
+                user.OTP = "0";
+
+                _context.SaveChanges();
+
+                // 5. Thông báo thành công và chuyển về trang Login
+                TempData["Success"] = "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login");
+            }
+
+            TempData["Error"] = "Đã có lỗi xảy ra, vui lòng thử lại!";
+            return RedirectToAction("ForgotPassword");
+        }
     }
 }
-// day la test 2 
-// day la test 4
+
