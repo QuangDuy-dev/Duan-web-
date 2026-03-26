@@ -29,6 +29,12 @@
                     </ul>
 
                     <div class="d-flex align-items-center">
+                        <form class="d-flex me-3" asp-controller="Home" asp-action="Index" method="get">
+                        <input class="form-control me-2" type="search" name="keyword" placeholder="Tìm kiếm sản phẩm" />
+                            <button class="btn btn-outline-success" type="submit">
+                         <i class="bi bi-search"></i>
+                          </button>
+                        </form>
                         @if (HttpContextAccessor.HttpContext?.Session?.GetString("UserName") != null)
                         {
                             <span class="me-2">
@@ -40,6 +46,8 @@
                         {
                             <a class="nav-link text-dark me-2" asp-controller="Account" asp-action="Login">Đăng nhập</a>
                         }
+
+                        
 
                         @* Nút Giỏ hàng với Badge *@
                         <a class="btn btn-primary position-relative" asp-controller="Cart" asp-action="Index"> 
