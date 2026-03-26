@@ -42,24 +42,29 @@
     }
     
     <div class="row">
-        @foreach (var item in Model)
+        @foreach (var item in Model ?? Enumerable.Empty<cuahang.Models.SanPham>())
         {
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card h-100 shadow-sm border-0">
                     <div class="text-center p-3">
-                        <img src="~/image/@item.ImageUrl" 
-                             class="card-img-top img-fluid" 
-                             style="max-height: 200px; object-fit: contain;" 
-                             alt="@item.TenSP"
+                        <img src="~/image/@(item?.ImageUrl ?? "default.jpg")"
+                             class="card-img-top img-fluid"
+                             style="max-height: 200px; object-fit: contain;"
+                             alt="@(item?.TenSP ?? "Sản phẩm")"
                              onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
                     </div>
 
                     <div class="card-body d-flex flex-column text-center">
-                        <h5 class="card-title fw-bold">@item.TenSP</h5>
-                        <p class="card-text text-muted small">@item.MoTa</p>
+                        <h5 class="card-title fw-bold">@(item?.TenSP ?? "Sản phẩm chưa có tên")</h5>
+                        <p class="card-text text-muted small">@(item?.MoTa ?? "Không có mô tả")</p>
+
                         <div class="mt-auto">
-                            <h5 class="text-danger">@item.Gia.ToString("N0") <span class="small">VNĐ</span></h5>
-                            <button class="btn btn-primary w-100 mt-2 shadow-sm">
+                            <h5 class="text-danger">
+                                @((item?.Gia ?? 0).ToString("N0")) <span class="small">VNĐ</span>
+                            </h5>
+                            @* data-id dùng để gửi ID lên Server *@
+                            <button class="btn btn-primary w-100 mt-2 shadow-sm btn-add-to-cart"
+                                    data-id="@item?.Id">
                                 <i class="bi bi-cart-plus"></i> Thêm vào giỏ
                             </button>
                         </div>
@@ -69,3 +74,42 @@
         }
     </div>
 </div>
+
+<style>
+    .card:hover {
+        transform: translateY(-5px);
+        transition: 0.3s;
+    }
+</style>
+
+@section Scripts {
+    @* Đảm bảo chỉ gọi jQuery một lần và đúng đường dẫn *@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.btn-add-to-cart').off('click').on('click', function() {
+                var productId = $(this).data('id');
+
+                $.ajax({
+                    url: '/Cart/AddToCart',
+                    type: 'POST',
+                    data: { id: productId },
+                    success: function(response) {
+                        if(response.success) {
+                            // HIỆN THÔNG BÁO: Sử dụng response.productName từ Controller gửi về
+                            alert("Đã thêm \"" + response.productName + "\" vào giỏ hàng thành công!");
+
+                            // CẬP NHẬT GIAO DIỆN: Làm mới để thấy số lượng giỏ hàng thay đổi trên header
+                            location.reload();
+                        } else {
+                            alert("Lỗi: " + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert("Không thể kết nối với máy chủ. Vui lòng kiểm tra lại SQL Server!");
+                    }
+                });
+            });
+        });
+    </script>
+}

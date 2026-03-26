@@ -9,7 +9,7 @@ namespace cuahang.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public string OTP { get; set; }
-        public string lvID {  get; set; }
+        public string lvID {  get; set; } 
 
         public virtual ICollection<HoaDon> HoaDons { get; set; }
 

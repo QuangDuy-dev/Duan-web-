@@ -1,0 +1,49 @@
+﻿@{
+    ViewData["Title"] = "Đặt hàng thành công";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="mb-4">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+            </div>
+
+            <h2 class="fw-bold text-success mb-3">ĐẶT HÀNG THÀNH CÔNG!</h2>
+
+            <div class="card shadow-sm border-0 p-4 bg-light">
+                <p class="fs-5 lh-lg">
+                    Cảm ơn <strong>@ViewBag.UserName</strong> đã tin tưởng và lựa chọn sử dụng dịch vụ của chúng tôi.
+                    Sự hài lòng của quý khách chính là động lực để chúng tôi không ngừng cải thiện và mang đến những trải nghiệm tốt nhất.
+                </p>
+                <p class="fs-5">
+                    Rất mong được tiếp tục đồng hành và phục vụ quý khách trong thời gian tới!
+                </p>
+            </div>
+
+            <div class="mt-5">
+                <a href="/" class="btn btn-primary btn-lg px-5 shadow">
+                    <i class="bi bi-house-door"></i> Quay về trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+   
+    .bi-check-circle-fill {
+        animation: scaleUp 0.5s ease-out;
+    }
+
+   
+    @@keyframes scaleUp {
+        0% {
+            transform: scale(0);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+</style>

@@ -1,0 +1,130 @@
+﻿@model IEnumerable<cuahang.Models.CartItem>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Giỏ hàng của bạn</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-warning">Giỏ hàng trống! <a href="/">Tiếp tục mua sắm</a></div>
+    }
+    else
+    {
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Ảnh</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Tổng</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr id="row-@item?.SanPhamId">
+                        <td><strong>@(item?.TenSP ?? "N/A")</strong></td>
+                        <td>
+                            <img src="~/image/@(item?.ImageUrl ?? "default.jpg")"
+                                 width="50" class="img-thumbnail"
+                                 onerror="this.src='/image/default.jpg'" />
+                        </td>
+                        <td>@((item?.Gia ?? 0).ToString("N0")) VNĐ</td>
+                        <td>
+                            <div class="d-flex" style="max-width: 120px;">
+                                <input type="number" class="form-control text-center quantity-input"
+                                       value="@(item?.SoLuong ?? 1)" min="1" data-id="@item?.SanPhamId">
+                            </div>
+                        </td>
+                        <td class="fw-bold item-total">@((item?.ThanhTien ?? 0).ToString("N0")) VNĐ</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger btn-remove" data-id="@item?.SanPhamId">
+                                <i class="bi bi-trash"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <h4>
+                Tổng cộng:
+                <span class="text-danger" id="cart-grand-total">
+                    @((ViewBag.TongTien as decimal? ?? 0).ToString("N0")) VNĐ
+                </span>
+            </h4>
+            <div>
+                <a href="/" class="btn btn-secondary">Tiếp tục mua hàng</a>
+                
+                <a asp-controller="Cart" asp-action="Checkout" class="btn btn-success btn-lg">
+                    Thanh toán ngay
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            // 1. Xử lý cập nhật số lượng khi thay đổi ô input
+            $('.quantity-input').on('change', function () {
+                var id = $(this).data('id');
+                var qty = $(this).val();
+                var row = $(this).closest('tr');
+
+                if (qty < 1) {
+                    $(this).val(1);
+                    qty = 1;
+                }
+
+                $.ajax({
+                    url: '/Cart/UpdateQuantity',
+                    type: 'POST',
+                    data: { id: id, quantity: qty },
+                    success: function (response) {
+                        if (response.success) {
+                            row.find('.item-total').text(response.totalItemPrice + " VNĐ");
+                            $('#cart-grand-total').text(response.grandTotal + " VNĐ");
+
+                            if (typeof loadCartCount === "function") {
+                                loadCartCount();
+                            } else {
+                                $('#cart-count').text(response.cartCount);
+                            }
+                        }
+                    },
+                    error: function () {
+                        alert("Không thể cập nhật số lượng!");
+                    }
+                });
+            });
+
+            // 2. Xử lý xóa sản phẩm
+            $('.btn-remove').click(function () {
+                var id = $(this).data('id');
+                var row = $(this).closest('tr');
+
+                if (confirm("Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+                    $.ajax({
+                        url: '/Cart/RemoveFromCart',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.success) {
+                                row.fadeOut(400, function () {
+                                    $(this).remove();
+                                    location.reload();
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

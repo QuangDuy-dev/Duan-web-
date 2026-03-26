@@ -7,7 +7,7 @@ namespace cuahang.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> _;
         private readonly ApplicationDbContext _db;
         public HomeController(ApplicationDbContext db) { _db = db; }
 

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using cuahang.Models;
+﻿using Azure;
 using cuahang;
+using cuahang.Models;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -13,6 +14,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -46,3 +48,17 @@ app.MapControllerRoute(
 
 app.Run();
 app.UseStaticFiles();
+// Thêm vào trước builder.Build()
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Giỏ hàng tồn tại trong 30p
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+
+});
+
+// Thêm vào sau app.UseRouting()
+app.UseSession();
+
+    
