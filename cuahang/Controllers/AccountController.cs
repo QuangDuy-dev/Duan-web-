@@ -81,7 +81,7 @@ namespace cuahang.Controllers
                     Name = username,
                     Password = password,
                     Email = email, 
-                    OTP = "0",                // Gán mặc định
+                    OTP = "0",                
                     lvID = "1"
                 };
 
