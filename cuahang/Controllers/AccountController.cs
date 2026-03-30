@@ -1,16 +1,25 @@
-
-﻿using BCrypt.Net;
+using BCrypt.Net;
+using cuahang.Models;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
-using MailKit.Net.Smtp;
-
-﻿using cuahang.Models;
-
+using System.Text.RegularExpressions;
 
 namespace cuahang.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly ApplicationDbContext _context;
+
+        // Khai báo các biến dùng chung để quản lý quy tắc mật khẩu
+        private const string PasswordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$";
+        private const string PasswordErrorMessage = "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số.";
+
+        public AccountController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -23,17 +32,9 @@ namespace cuahang.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear(); // Xóa sạch các biến toàn cục
-            return RedirectToAction("index","home");
-
+            return RedirectToAction("index", "home");
         }
 
-        private readonly ApplicationDbContext _context;
-
-        public AccountController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-        
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
@@ -53,7 +54,7 @@ namespace cuahang.Controllers
             }
 
             TempData["Error"] = "Tài khoản hoặc mật khẩu không chính xác!";
-            
+
             return View();
         }
 
@@ -65,14 +66,21 @@ namespace cuahang.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(string username, string password,string email, string confirmPassword)
+        public IActionResult Register(string username, string password, string email, string confirmPassword)
         {
             try
             {
+                // Kiểm tra định dạng mật khẩu bằng biến dùng chung
+                if (!Regex.IsMatch(password, PasswordPattern))
+                {
+                    TempData["Error"] = PasswordErrorMessage;
+                    return View();
+                }
+
                 if (password != confirmPassword)
                 {
                     TempData["Error"] = "Mật khẩu xác nhận không khớp. Vui lòng thử lại!";
-                    return View(); 
+                    return View();
                 }
                 // 1. Kiểm tra xem tên đăng nhập đã tồn tại chưa (Tùy chọn nhưng nên làm)
                 var existingUser = _context.nguoidung.FirstOrDefault(u => u.Name == username);
@@ -81,22 +89,28 @@ namespace cuahang.Controllers
                     TempData["Error"] = "Tên đăng nhập này đã có người sử dụng!";
                     return View();
                 }
-
-                // 2. Tạo đối tượng mới để ghi vào DB
+                // 2. Kiểm tra trùng Email 
+                var existingEmail = _context.nguoidung.FirstOrDefault(u => u.Email == email);
+                if (existingEmail != null)
+                {
+                    TempData["Error"] = "Email này đã được đăng ký bởi một tài khoản khác!";
+                    return View();
+                }
+                // 3. Tạo đối tượng mới để ghi vào DB
                 var newUser = new Models.User
                 {
                     Name = username,
                     Password = BCrypt.Net.BCrypt.HashPassword(password),
-                    Email = email, 
-                    OTP = "0",                
+                    Email = email,
+                    OTP = "0",
                     lvID = "1"
                 };
 
-                // 3. Lệnh LINQ để thêm và lưu
+                // 4. Lệnh LINQ để thêm và lưu
                 _context.nguoidung.Add(newUser);
                 _context.SaveChanges();
 
-                // 4. Báo thành công và chuyển hướng về trang Login
+                // 5. Báo thành công và chuyển hướng về trang Login
                 TempData["Success"] = "Đăng ký thành công! Bạn có thể đăng nhập ngay.";
                 return RedirectToAction("Login");
             }
@@ -106,12 +120,13 @@ namespace cuahang.Controllers
                 return View();
             }
         }
+
         // Trang quên mật khẩu 
         public IActionResult ForgotPassword()
         {
             return View();
         }
-        
+
         [HttpPost]
         public IActionResult SendOTP(string email)
         {
@@ -145,17 +160,17 @@ namespace cuahang.Controllers
                         client.Send(message);
                         client.Disconnect(true);
                     }
-                    return Ok(); 
+                    return Ok();
                 }
                 catch (Exception ex)
                 {
-                  
+
                     return StatusCode(500, ex.Message);
                 }
             }
             return BadRequest();
         }
-        
+
         [HttpGet]
         public IActionResult ChangePassWord(string email)
         {
@@ -173,12 +188,12 @@ namespace cuahang.Controllers
             if (user != null)
             {
                 TempData["Success"] = "Xác thực OTP thành công!";
-                return RedirectToAction("ChangePassword", new { email = email });
+                ViewBag.Email = email;
+                return RedirectToAction("ChangePassWord", new { email = email });
             }
+
             TempData["Error"] = "Mã OTP không chính xác. Vui lòng kiểm tra lại!";
-
             ViewBag.Email = email;
-
             return View("ForgotPassword");
         }
 
@@ -186,12 +201,20 @@ namespace cuahang.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ConfirmChangePassword(string email, string newPassword, string confirmPassword)
         {
+            // Kiểm tra định dạng mật khẩu mới bằng biến dùng chung
+            if (!Regex.IsMatch(newPassword, PasswordPattern))
+            {
+                TempData["Error"] = PasswordErrorMessage;
+                ViewBag.Email = email;
+                return View("ChangePassword");
+            }
+
             // 1. Kiểm tra mật khẩu có khớp nhau không
             if (newPassword != confirmPassword)
             {
                 TempData["Error"] = "Mật khẩu xác nhận không khớp!";
-                ViewBag.Email = email; 
-                return View("ChangePassWord"); 
+                ViewBag.Email = email;
+                return View("ChangePassword");
             }
 
             // 2. Tìm người dùng trong database theo Email
@@ -213,8 +236,7 @@ namespace cuahang.Controllers
             }
 
             TempData["Error"] = "Đã có lỗi xảy ra, vui lòng thử lại!";
-            return RedirectToAction("ForgotPassword");
+            return View("ForgotPassword");
         }
     }
 }
-
