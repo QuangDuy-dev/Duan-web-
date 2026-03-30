@@ -89,8 +89,14 @@ namespace cuahang.Controllers
                     TempData["Error"] = "Tên đăng nhập này đã có người sử dụng!";
                     return View();
                 }
-
-                // 2. Tạo đối tượng mới để ghi vào DB
+                // 2. Kiểm tra trùng Email 
+                var existingEmail = _context.nguoidung.FirstOrDefault(u => u.Email == email);
+                if (existingEmail != null)
+                {
+                    TempData["Error"] = "Email này đã được đăng ký bởi một tài khoản khác!";
+                    return View();
+                }
+                // 3. Tạo đối tượng mới để ghi vào DB
                 var newUser = new Models.User
                 {
                     Name = username,
@@ -100,11 +106,11 @@ namespace cuahang.Controllers
                     lvID = "1"
                 };
 
-                // 3. Lệnh LINQ để thêm và lưu
+                // 4. Lệnh LINQ để thêm và lưu
                 _context.nguoidung.Add(newUser);
                 _context.SaveChanges();
 
-                // 4. Báo thành công và chuyển hướng về trang Login
+                // 5. Báo thành công và chuyển hướng về trang Login
                 TempData["Success"] = "Đăng ký thành công! Bạn có thể đăng nhập ngay.";
                 return RedirectToAction("Login");
             }
