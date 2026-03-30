@@ -11,6 +11,8 @@
         public string MoTa { get; set; }
         public int SoLuongTon { get; set; }
 
+        public string LoaiSp {  get; set; }
+
         public string DanhGia { get; set; }
 
         public string? ImageUrl { get; set; }
