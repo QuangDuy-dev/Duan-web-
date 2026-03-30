@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ✅ FIX: thêm biến global
     let currentUserId = 1; // TODO: thay bằng user thật nếu có login
     let currentReceiptId = null;
 
@@ -107,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
     async function generateReceipt() {
         updateReceiptPreview();
 
-        // ✅ FIX: kiểm tra ID tồn tại
         if (!currentReceiptId) {
             alert("Chưa có ID đơn hàng!");
             return;
@@ -161,7 +159,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const uniqueReceiptId = `${userId}${datePart}${timePart}`;
 
-        // ✅ FIX: gán ID toàn cục
         currentReceiptId = uniqueReceiptId;
 
         document.getElementById('previewcusAddress').textContent =
