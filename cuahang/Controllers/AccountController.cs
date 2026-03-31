@@ -2,6 +2,7 @@ using BCrypt.Net;
 using cuahang.Models;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using System.Text.RegularExpressions;
 
@@ -237,6 +238,40 @@ namespace cuahang.Controllers
 
             TempData["Error"] = "Đã có lỗi xảy ra, vui lòng thử lại!";
             return View("ForgotPassword");
+        }
+        
+      
+
+        public IActionResult LichSuDonHangUser() //khachhang
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            // Lấy danh sách hóa đơn của User này, kèm theo chi tiết sản phẩm
+            var lichSu = _context.HoaDon
+                .Include(h => h.ChiTietHoaDons)
+                .ThenInclude(ct => ct.SanPham)
+                .Where(h => h.UserId == userId)
+                .OrderByDescending(h => h.NgayDat)
+                .ToList();
+
+            return View(lichSu);
+        }
+
+        public IActionResult ChiTietDonHang(int id)
+        {
+            // Lấy thông tin hóa đơn và các chi tiết sản phẩm đi kèm
+            var hoaDon = _context.HoaDon
+                .Include(h => h.ChiTietHoaDons) // Load bảng chi tiết
+                .ThenInclude(ct => ct.SanPham)  // Load thông tin Sản phẩm để lấy Tên, Hình ảnh
+                .FirstOrDefault(h => h.Id == id);
+
+            if (hoaDon == null)
+            {
+                return NotFound();
+            }
+
+            return View(hoaDon);
         }
     }
 }

@@ -163,11 +163,37 @@ namespace cuahang.Controllers
         [HttpPost]
         public IActionResult ConfirmOrder(string DiaChi, string SoDienThoai)
         {
-            if (string.IsNullOrEmpty(DiaChi) || string.IsNullOrEmpty(SoDienThoai))
+            var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null || !cart.Any()) return RedirectToAction("Login", "Account");
+
+            // 1. Tạo hóa đơn mới
+            var hoaDon = new HoaDon
             {
-                return RedirectToAction("Checkout");
+                NgayDat = DateTime.Now,
+                UserId = userId.Value,
+                TongTien = cart.Sum(x => x.ThanhTien), // Tính tổng tiền sau voucher nếu cần
+                TrangThai = "Chờ xử lý"
+            };
+
+            _context.HoaDon.Add(hoaDon);
+            _context.SaveChanges(); // Lưu để lấy Id của HoaDon vừa tạo
+
+            // 2. Lưu chi tiết hóa đơn
+            foreach (var item in cart)
+            {
+                var ct = new ChiTietHoaDon
+                {
+                    HoaDonId = hoaDon.Id,
+                    SanPhamId = item.SanPhamId,
+                    SoLuong = item.SoLuong,
+                    DonGia = item.Gia
+                };
+                _context.ChiTietHoaDon.Add(ct);
             }
 
+            _context.SaveChanges();
             HttpContext.Session.Remove("GioHang");
 
             return RedirectToAction("OrderSuccess");
