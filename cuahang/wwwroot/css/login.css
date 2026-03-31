@@ -10,7 +10,7 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, black, white);
+    background: linear-gradient(135deg, black, white); /*testing, somehow this doesnt affect the site???*/
     min-height: 100vh;
 }
 
