@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="~/cuahang.styles.css" asp-append-version="true" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <header>
@@ -53,14 +54,30 @@
                         }
 
                         
-
+                        @{
+                            
+                            var userid = Context.Session.GetString("UserId");
+                        }
                         @* Nút Giỏ hàng với Badge *@
+                        @if (userid!=null)
+                        {
                         <a class="btn btn-primary position-relative" asp-controller="Cart" asp-action="Index"> 
                             <i class="bi bi-cart3"></i> Giỏ hàng
                             <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                 0
                             </span>
-                        </a>
+                            </a>
+                        }
+                        else
+                        {
+                            @* Khi chưa đăng nhập: Gọi hàm Javascript thông báo *@
+              <button class="btn btn-secondary position-relative" onclick="requireLogin()">
+                   <i class="bi bi-cart3"></i> Giỏ hàng
+                   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">
+                          0
+                   </span>
+             </button>
+                        }
                     </div>
                 </div>
             </div>
@@ -152,6 +169,26 @@
             loadCartCount();
         });
     </script>
+
+    <script>
+    function requireLogin() {
+        Swal.fire({
+            title: 'Bạn chưa đăng nhập!',
+            text: "Vui lòng đăng nhập để xem giỏ hàng và mua sắm.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#aaa',
+            confirmButtonText: 'Đăng nhập ngay',
+            cancelButtonText: 'Để sau'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Chuyển hướng sang trang đăng nhập của bạn
+                window.location.href = '/Account/Login'; 
+            }
+        })
+    }
+</script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
