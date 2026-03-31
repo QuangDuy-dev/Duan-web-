@@ -13,14 +13,19 @@ a {
 
 .btn-primary {
   color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  background-color: var(--primary-color);
+  border-color: var(--border-color);
+}
+
+.btn:hover, .btn-link.nav-link:hover{
+  background-color: var(--primary-color);
+  border-color: var(--secondary-color);
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
   color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  background-color: var(--primary-color);
+  border-color: var(--border-color);;
 }
 
 .border-top {
