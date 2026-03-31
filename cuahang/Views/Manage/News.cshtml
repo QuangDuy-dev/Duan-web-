@@ -1,0 +1,61 @@
+﻿@model IEnumerable<cuahang.Models.BaiBao>
+@{
+    ViewBag.Title = "Quản lý bài báo";
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+}
+
+<h3 class="mb-4"><i class="bi bi-newspaper"></i> Quản lý bài báo</h3>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white fw-bold">Thêm bài báo mới</div>
+    <div class="card-body">
+
+        <form asp-action="CreateNews" method="post" class="p-4 shadow-sm border rounded bg-light">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Tiêu đề bài báo</label>
+                <input name="TieuDe" class="form-control" placeholder="Nhập tiêu đề..." required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Link hình ảnh (URL)</label>
+                <input name="HinhAnh" class="form-control" placeholder="Dán link ảnh tại đây (ví dụ: https://...)" />
+                <small class="text-muted">Bạn có thể lấy link ảnh từ mạng hoặc nhập /image/ten-anh.jpg</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Nội dung bài viết</label>
+                <textarea name="NoiDung" class="form-control" rows="10" placeholder="Viết nội dung chi tiết tại đây..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                <i class="bi bi-send-fill"></i> Đăng bài báo ngay
+            </button>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered table-hover shadow-sm">
+    <thead class="table-dark text-center">
+        <tr>
+            <th>ID</th>
+            <th>Tiêu đề</th>
+            <th>Ngày đăng</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="text-center">
+                <td>@item.Id</td>
+                <td class="text-start">@item.TieuDe</td>
+                <td>@item.NgayDang?.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    <a asp-action="DeleteNews" asp-route-id="@item.Id" class="btn btn-danger btn-sm" onclick="return confirm('Xóa bài viết này?')">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

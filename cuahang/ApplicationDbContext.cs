@@ -12,5 +12,6 @@ namespace cuahang
         public DbSet<SanPham> SanPham { get; set; }
         public DbSet<HoaDon> HoaDon { get; set; }
         public DbSet<ChiTietHoaDon> ChiTietHoaDon { get; set; }
+        public DbSet<BaiBao> BaiBao { get; set; }
     }
 }
