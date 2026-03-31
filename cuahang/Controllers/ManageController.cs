@@ -43,4 +43,32 @@ public class ManageController : Controller
         var sp = _db.SanPham.Find(id);
         return View(sp);
     }
+
+    //Trang danh sách bài báo trong Mangage
+    public IActionResult News()
+    {
+        var news = _db.BaiBao.OrderByDescending(x => x.NgayDang).ToList();
+        return View(news);
+    }
+
+    // Xử lý thêm bài báo
+    [HttpPost]
+    public IActionResult CreateNews(BaiBao bb)
+    {
+        _db.BaiBao.Add(bb);
+        _db.SaveChanges();
+        return RedirectToAction("News");
+    }
+
+    // Xóa bài báo
+    public IActionResult DeleteNews(int id)
+    {
+        var bb = _db.BaiBao.Find(id);
+        if (bb != null)
+        {
+            _db.BaiBao.Remove(bb);
+            _db.SaveChanges();
+        }
+        return RedirectToAction("News");
+    }
 }
