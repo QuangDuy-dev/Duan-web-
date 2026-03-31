@@ -74,25 +74,32 @@
             <ion-icon name="share-social"></ion-icon>
         </div>
         <li style="--i: 0; --clr: #1877f2">
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://facebook.com"><i class="fab fa-facebook-f"></i></a>
         </li>
-        <li style="--i: 1; --clr: #25d366">
-            <a href="#"><i class="fab fa-whatsapp"></i></a>
+        <li style="--i: 1; --clr: #1877f2">
+            <a href="https://zalo.me/0123456789" target="_blank">
+                <svg class="zalo-icon" viewBox="0 0 48 48">
+                    <path fill="#0068FF" d="M24 4C13 4 4 11.5 4 20.5c0 5.3 3.3 10 8.5 13.1L10 44l10.4-5.5c1.2.2 2.4.3 3.6.3 11 0 20-7.5 20-16.5S35 4 24 4z" />
+                    <text x="24" y="28" font-size="14" text-anchor="middle" fill="white">Zalo</text>
+                </svg>
+            </a>
         </li>
-        <li style="--i: 2; --clr: #1b1e21">
-            <a href="#"><i class="fab fa-x-twitter"></i></a>
+        <li style="--i: 2; --clr: #25d366">
+            <a href="#" onclick="openCallModal('+84123456789')">
+                <i class="fa-solid fa-phone"></i>
+            </a>
         </li>
-        <li style="--i: 3; --clr: #ff5733">
+        <li style="--i: 3; --clr: #1b1e21">
+            <a href="https://github.com/QuangDuy-dev/Duan-web-"><i class="fab fa-github"></i></a>
+        </li>
+        <li style="--i: 4; --clr: #ff5733">
             <a href="#"><i class="fab fa-reddit-alien"></i></a>
         </li>
-        <li style="--i: 4; --clr: #0a66c2">
+        <li style="--i: 5; --clr: #0a66c2">
             <a href="#"><i class="fab fa-linkedin-in"></i></a>
         </li>
-        <li style="--i: 5; --clr: #c32aa3">
+        <li style="--i: 6; --clr: #c32aa3">
             <a href="#"><i class="fab fa-instagram"></i></a>
-        </li>
-        <li style="--i: 6; --clr: #1b1e21">
-            <a href="https://github.com/QuangDuy-dev/Duan-web-"><i class="fab fa-github"></i></a>
         </li>
         <li style="--i: 7; --clr: #ff0000">
             <a href="#"><i class="fab fa-youtube"></i></a>
@@ -104,6 +111,16 @@
             &copy; 2026 - cuahang - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
+    <div class="call-modal" id="callModal">
+        <div class="modal-box">
+            <p>Gọi <span id="phoneNumber"></span> ?</p>
+            <div class="actions">
+                <button class="ok">Gọi</button>
+                <button class="cancel">Huỷ</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

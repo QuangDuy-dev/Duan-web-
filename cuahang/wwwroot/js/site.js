@@ -8,3 +8,18 @@ const toggle = document.querySelector(".toggle");
 toggle.addEventListener("click", () => {
     menu.classList.toggle("active");
 })
+
+function openCallModal(number) {
+    const modal = document.getElementById('callModal');
+    document.getElementById('phoneNumber').innerText = number;
+
+    modal.classList.add('active');
+
+    modal.querySelector('.ok').onclick = () => {
+        window.location.href = 'tel:' + number;
+    };
+
+    modal.querySelector('.cancel').onclick = () => {
+        modal.classList.remove('active');
+    };
+}
