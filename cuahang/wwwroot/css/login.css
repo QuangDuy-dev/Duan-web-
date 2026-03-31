@@ -4,13 +4,14 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    font-family: var(--main-font);
 }
 
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(to right, #cbd5e1, #a5b4fc);
+    background: linear-gradient(135deg, black, white);
+    min-height: 100vh;
 }
 
 .container {
@@ -30,6 +31,8 @@ body {
 
 h2 {
     font-size: 34px;
+    font-weight: var(--weight-extra-bold);
+    color: var(--primary-color);
     text-align: center;
     margin-bottom: 20px;
 }
@@ -42,18 +45,20 @@ input {
     border: none;
     outline: none;
     font-size: 16px;
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 20px;
+    transition: all 0.3s ease;
 }
 
 button {
     width: 100%;
     padding: 12px;
-    background: #7494ec;
+    background: var(--primary-color);
     border-radius: 6px;
     border: none;
     cursor: pointer;
     font-size: 16px;
+    font-weight: var(--weight-semibold);
     color: #fff;
     font-weight: 500;
     margin-bottom: 20px;
@@ -61,22 +66,26 @@ button {
 }
 
 button:hover {
-    background: #6884d3;
+    background: var(--secondary-color);
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--secondary-color);
 }
 
 p {
     font-size: 14.5px;
     text-align: center;
     margin-bottom: 10px;
+    color: var(--text-color);
 }
 
 p a {
-     color: #7494ec;
-     text-decoration: none;
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: var(--weight-bold);
 }
 
 p a:hover {
     text-decoration: underline;
+    color: var(--primary-color);
 }
 
 .forgot-password-link {
@@ -86,9 +95,9 @@ p a:hover {
 
 .forgot-password-link a {
     font-size: 0.9em;
-    color: #808080; 
+    color: var(--text-color);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: var(--weight-semibold);
 }
 .forgot-password-link a:hover {
     text-decoration: underline;
