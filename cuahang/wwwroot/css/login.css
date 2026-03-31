@@ -10,7 +10,7 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, black, white); /*testing, somehow this doesnt affect the site???*/
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); /*testing, somehow this doesnt affect the site???*/
     min-height: 100vh;
 }
 
@@ -78,14 +78,14 @@ p {
 }
 
 p a {
-    color: var(--secondary-color);
+    color: var(--primary-color);
     text-decoration: none;
     font-weight: var(--weight-bold);
 }
 
 p a:hover {
     text-decoration: underline;
-    color: var(--primary-color);
+    color: var(--secondary-color);
 }
 
 .forgot-password-link {
