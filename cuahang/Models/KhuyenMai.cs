@@ -9,6 +9,8 @@
         public int KMSoluong { get; set; }
         public string HeSoGiam {  get; set; }
 
+        public string GiamToiDa { get; set; }
+
         public DateTime NgayHetHang { get; set; }
     }
 }
