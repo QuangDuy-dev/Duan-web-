@@ -98,6 +98,7 @@ public class ManageController : Controller
     public IActionResult Create(SanPham sp)
     {
         sp.HinhAnh = "0";
+        sp.DanhGia = "0";
 
         _db.SanPham.Add(sp);
         _db.SaveChanges();
