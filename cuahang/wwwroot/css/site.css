@@ -1,24 +1,24 @@
-html {
-  font-size: 14px;
+﻿html {
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 .card:hover {
@@ -35,18 +35,17 @@ body {
 
 .menu {
     position: fixed;
-    bottom: 35px;
-    right: 35px;
-
     width: 280px;
     height: 280px;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    transform: translate(50%, 50%);
-    transition: transform 0.5s ease;
+    transform: none !important;
     z-index: 999;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    overflow: visible;
 }
 
 .zalo-icon {
@@ -58,69 +57,67 @@ body {
     width: 2.5rem;
 }
 
-    .menu.active {
-        transform: translate(0, 0);
+.menu .toggle {
+    position: relative;
+    height: 60px;
+    width: 60px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25), 0 1px 4px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    font-size: 2rem;
+    cursor: grab;
+    transition: box-shadow 0.2s, transform 1.25s;
+    z-index: 5;
+}
+
+    .menu .toggle:active {
+        cursor: grabbing;
     }
 
-    .menu .toggle {
-        position: relative;
-        height: 60px;
-        width: 60px;
-        background: #fff;
-        border-radius: 50%;
-        box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #333;
-        font-size: 2rem;
-        cursor: pointer;
-        transition: 1.25s;
-        z-index: 5;
-    }
+.menu.active .toggle {
+    transform: rotate(360deg);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15), 0 0 0 2px #333, 0 0 0 8px #fff;
+}
 
-    .menu.active .toggle {
-        transform: rotate(360deg);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15), 0 0 0 2px #333, 0 0 0 8px #fff;
-    }
+.menu li {
+    position: absolute;
+    left: 0;
+    list-style: none;
+    transform: rotate(calc(360deg / 8 * var(--i)));
+    transform-origin: 140px;
+    scale: 0;
+    transition: scale 0.5s;
+    transition-delay: calc(0.05s * var(--i));
+}
 
-    .menu li {
-        position: absolute;
-        left: 0;
-        list-style: none;
-        transition: 0.5s;
-        transform: rotate(calc(360deg / 8 * var(--i)));
-        transform-origin: 140px;
-        scale: 0;
-        transition-delay: calc(0.05s * var(--i));
-    }
+.menu.active li {
+    scale: 1;
+}
 
-    .menu.active li {
-        scale: 1;
-    }
+.menu li a {
+    display: flex;
+    transform: rotate(calc(360deg / -8 * var(--i)));
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.75rem;
+    color: var(--clr);
+    box-shadow: 0 3px 4px rgba(0,0,0,0.15);
+    transition: 0.5s;
+    text-decoration: none;
+}
 
-    .menu li a {
-        position: relative;
-        display: flex;
-        transform: rotate(calc(360deg / -8 * var(--i)));
-        width: 60px;
-        height: 60px;
-        background-color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        font-size: 1.75rem;
-        color: var(--clr);
-        box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
-        transition: 0.5s;
-        text-decoration: none;
-    }
-
-    .menu li:hover a {
-        font-size: 2.5rem;
-        box-shadow: 0 0 0 2px var(--clr), 0 0 0 6px #fff;
-    }
+.menu li:hover a {
+    font-size: 2.5rem;
+    box-shadow: 0 0 0 2px var(--clr), 0 0 0 6px #fff;
+}
 
 .call-modal {
     position: fixed;
@@ -132,6 +129,7 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: 0.3s;
+    z-index: 10000;
 }
 
     .call-modal.active {
