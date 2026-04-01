@@ -114,3 +114,11 @@ h4, h5 {
     right: 20px;
     z-index: 9999;
 }
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.5rem;
+}
