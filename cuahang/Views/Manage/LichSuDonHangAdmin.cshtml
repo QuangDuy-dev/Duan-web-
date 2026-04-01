@@ -46,11 +46,16 @@
                     <td>@dh.NgayDat.ToString("dd/MM/yyyy HH:mm")</td>
                     <td class="search-name">@dh.User.Name</td>
                     <td class="fw-bold text-danger">@dh.TongTien.ToString("N0") đ</td>
-                    <td>
-                        <span class="badge @(dh.TrangThai == "Hoàn thành" ? "bg-success" : "bg-warning")">
-                        @dh.TrangThai
-                        </span>
-                    </td>
+                       <td>
+        <select class="form-select form-select-sm status-select" 
+                data-id="@dh.Id" 
+                style="width: 150px; font-weight: bold;">
+            <option value="Chờ duyệt" selected="@(dh.TrangThai == "Chờ duyệt")">Chờ duyệt</option>
+            <option value="Đang giao" selected="@(dh.TrangThai == "Đang giao")">Đang giao</option>
+            <option value="Hoàn thành" selected="@(dh.TrangThai == "Hoàn thành")">Hoàn thành</option>
+            <option value="Đã hủy" selected="@(dh.TrangThai == "Đã hủy")">Đã hủy</option>
+        </select>
+    </td>
                     
                 </tr>
         }
@@ -97,6 +102,35 @@
                         $(this).toggle($(this).text().toLowerCase().includes(value));
                     });
                 });
+
+                    $(".status-select").on("change", function () {
+            const orderId = $(this).data("id");
+            const newStatus = $(this).val();
+            const selectElement = $(this);
+
+            // Hiệu ứng đổi màu nhanh (tùy chọn)
+            selectElement.css("opacity", "0.5");
+
+            $.ajax({
+                url: '/Manage/UpdateStatus',
+                type: 'POST',
+                data: { id: orderId, status: newStatus },
+                success: function (response) {
+                    if (response.success) {
+                        // Hiển thị thông báo nhỏ hoặc đổi màu viền để báo thành công
+                        selectElement.css("border-color", "#28a745");
+                        setTimeout(() => {
+                            selectElement.css({ "opacity": "1", "border-color": "#ced4da" });
+                        }, 1000);
+                    } else {
+                        alert("Lỗi: " + response.message);
+                    }
+                },
+                error: function () {
+                    alert("Đã xảy ra lỗi khi kết nối với máy chủ.");
+                }
+            });
+        });
             });
 
             function updateChart(type) {

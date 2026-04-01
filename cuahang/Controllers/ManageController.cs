@@ -75,6 +75,19 @@ public class ManageController : Controller
         return View(tatCaDonHang);
     }
 
+    [HttpPost]
+    public IActionResult UpdateStatus(int id, string status)
+    {
+        var hoadon = _db.HoaDon.Find(id);
+        if (hoadon != null)
+        {
+            hoadon.TrangThai = status;
+            _db.SaveChanges();
+            return Json(new { success = true });
+        }
+        return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
+    }
+
     public IActionResult Manage()
     {
         var data = _db.SanPham.ToList();
@@ -101,6 +114,8 @@ public class ManageController : Controller
         }
         return RedirectToAction("Manage");
     }
+
+
 
     public IActionResult Details(int id)
     {
