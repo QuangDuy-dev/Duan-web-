@@ -13,5 +13,7 @@ namespace cuahang
         public DbSet<HoaDon> HoaDon { get; set; }
         public DbSet<ChiTietHoaDon> ChiTietHoaDon { get; set; }
         public DbSet<BaiBao> BaiBao { get; set; }
+
+        public DbSet<KhuyenMai> khuyenMais { get; set; }
     }
 }
