@@ -11,11 +11,11 @@
     --main-font: 'Open Sans', sans-serif;
     --heading-font: 'Open Sans', sans-serif;
     /* Weights */
-    --weight-light: 300;
-    --weight-regular: 400;
-    --weight-semibold: 600;
-    --weight-bold: 700;
-    --weight-extra-bold: 800;
+    --fw-light: 300;
+    --fw-regular: 400;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+    --fw-extra-bold: 800;
 }
 
 html {
@@ -28,12 +28,16 @@ html {
   }
 }
 
+.navbar .nav-link.login-link {
+    color: var(--secondary-color) !important;
+}
+
 .navbar .nav-link, 
 .btn-outline-success, 
 .btn-outline-danger {
     transition: all 0.3s ease;
     font-family: var(--main-font);
-    font-weight: var(--weight-semibold);
+    font-weight: var(--fw-semibold);
     border-radius: 4px; 
 }
 
@@ -52,12 +56,13 @@ html {
     background-color: transparent !important; 
 }
 
-.btn-primary {
+.btn-primary, .btn-secondary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
+    font-weight: var(--fw-bold);
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .btn-secondary:hover {
     background-color: var(--secondary-color);
     border-color: var(--secondary-color);
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--secondary-color);
@@ -66,6 +71,10 @@ html {
 .btn-outline-success, .btn-outline-danger {
     color: var(--text-color);
     border-color: #dee2e6; 
+}
+
+.btn .btn-logout{
+    font-weight: var(--fw-regular);
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -86,19 +95,19 @@ body {
 
 h1 {
     font-family: var(--main-font);
-    font-weight: var(--weight-extra-bold);
+    font-weight: var(--fw-extra-bold);
     color: var(--primary-color);
 }
 
 h2, h3 {
     font-family: var(--main-font);
-    font-weight: var(--weight-bold);
+    font-weight: var(--fw-bold);
     color: var(--primary-color);
 }
 
 h4, h5 {
     font-family: var(--main-font);
-    font-weight: var(--weight-bold);
+    font-weight: var(--fw-bold);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
