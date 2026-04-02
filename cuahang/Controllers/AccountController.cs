@@ -262,6 +262,7 @@ namespace cuahang.Controllers
         {
             // Lấy thông tin hóa đơn và các chi tiết sản phẩm đi kèm
             var hoaDon = _context.HoaDon
+                .Include(h=>h.User)
                 .Include(h => h.ChiTietHoaDons) // Load bảng chi tiết
                 .ThenInclude(ct => ct.SanPham)  // Load thông tin Sản phẩm để lấy Tên, Hình ảnh
                 .FirstOrDefault(h => h.Id == id);
