@@ -4,7 +4,7 @@
     ViewData["Title"] = "Tin tức mới nhất";
 }
 
-<div class="container mt-5">
+<div class="container mt-4 mt-md-5">
     <h2 class="text-center mb-5 fw-bold text-uppercase news-heading">
         <span>Tin tức mới nhất</span>
     </h2>
@@ -17,7 +17,8 @@
                     <div class="news-image-wrapper">
                         <img src="@(string.IsNullOrEmpty(item.HinhAnh) || item.HinhAnh == "0" ? "/image/default-news.webp" : item.HinhAnh)"
                              class="card-img-top"
-                             alt="@item.TieuDe">
+                             alt="@item.TieuDe"
+                             style="aspect-ratio: 16/9; object-fit: cover;">
                     </div>
 
                     <div class="card-body d-flex flex-column text-start">
@@ -25,9 +26,10 @@
                             <i class="bi bi-calendar3"></i> @item.NgayDang?.ToString("dd/MM/yyyy")
                         </small>
                         
-                        <h5 class="card-title fw-bold news-card-title">@item.TieuDe</h5>
+                        <h5 class="card-title fw-bold news-card-title text-break">@item.TieuDe</h5>
 
-                        <p class="card-text text-secondary mb-3 news-card-excerpt">
+                        <p class="card-text text-secondary mb-3 news-card-excerpt" 
+                           style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
                             @item.NoiDung
                         </p>
 
