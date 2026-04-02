@@ -105,6 +105,24 @@ public class ManageController : Controller
         return RedirectToAction("Manage");
     }
 
+    [HttpPost]
+    public IActionResult Edit([FromBody] SanPham sp)
+    {
+        var existing = _db.SanPham.Find(sp.Id);
+        if (existing == null)
+            return Json(new { success = false, message = "Không tìm thấy sản phẩm" });
+
+        existing.TenSP = sp.TenSP;
+        existing.Gia = sp.Gia;
+        existing.SoLuongTon = sp.SoLuongTon;
+        existing.ImageUrl = sp.ImageUrl;
+        existing.LoaiSp = sp.LoaiSp;
+        existing.MoTa = sp.MoTa;
+
+        _db.SaveChanges();
+        return Json(new { success = true });
+    }
+
     public IActionResult Delete(int id)
     {
         var sp = _db.SanPham.Find(id);
