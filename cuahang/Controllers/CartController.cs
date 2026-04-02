@@ -7,15 +7,12 @@ using System.Linq;
 
 namespace cuahang.Controllers
 {
-    
     public class CartController(ApplicationDbContext context) : Controller
     {
         private readonly ApplicationDbContext _context = context;
 
-       
         public IActionResult GetCartCount()
         {
-            
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             return Json(new { count = cart.Sum(x => x.SoLuong) });
         }
@@ -23,21 +20,12 @@ namespace cuahang.Controllers
         [HttpPost]
         public IActionResult UpdateQuantity(int id, int quantity)
         {
-            
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             var item = cart.FirstOrDefault(p => p.SanPhamId == id);
 
             if (item != null)
             {
-                if (quantity > 0)
-                {
-                    item.SoLuong = quantity;
-                }
-                else
-                {
-                    item.SoLuong = 1;
-                }
-
+                item.SoLuong = quantity > 0 ? quantity : 1;
                 HttpContext.Session.SetJson("GioHang", cart);
             }
 
@@ -50,15 +38,16 @@ namespace cuahang.Controllers
             });
         }
 
-        // 3. Thêm vào giỏ
         [HttpPost]
         public IActionResult AddToCart(int id)
         {
-            if(HttpContext.Session.Id==null)
+            // Kiểm tra đăng nhập qua Session UserId
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
-                //popup ko có tài khoản -> đâng nhập 
+                return Json(new { success = false, message = "Vui lòng đăng nhập để thêm vào giỏ hàng!" });
             }
-           
+
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             var item = cart.FirstOrDefault(p => p.SanPhamId == id);
 
@@ -69,11 +58,7 @@ namespace cuahang.Controllers
             else
             {
                 var product = _context.SanPham.Find(id);
-
-                if (product == null)
-                {
-                    return Json(new { success = false, message = "Sản phẩm không tồn tại!" });
-                }
+                if (product == null) return Json(new { success = false, message = "Sản phẩm không tồn tại!" });
 
                 cart.Add(new CartItem
                 {
@@ -86,71 +71,38 @@ namespace cuahang.Controllers
             }
 
             HttpContext.Session.SetJson("GioHang", cart);
-
-            return Json(new
-            {
-                success = true,
-                productName = cart.FirstOrDefault(p => p.SanPhamId == id)?.TenSP,
-                count = cart.Sum(x => x.SoLuong)
-            });
+            return Json(new { success = true, productName = cart.FirstOrDefault(p => p.SanPhamId == id)?.TenSP, count = cart.Sum(x => x.SoLuong) });
         }
 
-        // 4. Trang danh sách giỏ hàng
-        public IActionResult Index() // đổi lại tên (danh sách hàng) 
+        public IActionResult Index()
         {
-            
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             ViewBag.TongTien = cart.Sum(s => s.ThanhTien);
             return View(cart);
         }
 
-        // 5. Xóa khỏi giỏ
         [HttpPost]
         public IActionResult RemoveFromCart(int id)
         {
-           
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             var item = cart.FirstOrDefault(p => p.SanPhamId == id);
-
             if (item != null)
             {
                 cart.Remove(item);
                 HttpContext.Session.SetJson("GioHang", cart);
             }
-
             return Json(new { success = true, count = cart.Sum(x => x.SoLuong) });
         }
 
-        // 6. Action xử lý tính toán Voucher và hiển thị trang xác nhận thanh toán
         [HttpGet]
         public IActionResult Checkout()
         {
-            
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
-
-            if (!cart.Any())
-            {
-                return RedirectToAction("Index");
-            }
+            if (!cart.Any()) return RedirectToAction("Index");
 
             decimal tongTienHang = cart.Sum(x => x.ThanhTien);
-            decimal voucherGiam = 0;
-            int phanTramGiam = 0;
-
-            if (tongTienHang > 100000000)
-            {
-                phanTramGiam = 35;
-            }
-            else if (tongTienHang > 70000000)
-            {
-                phanTramGiam = 25;
-            }
-            else if (tongTienHang > 50000000)
-            {
-                phanTramGiam = 15;
-            }
-
-            voucherGiam = tongTienHang * phanTramGiam / 100;
+            int phanTramGiam = tongTienHang > 100000000 ? 35 : (tongTienHang > 70000000 ? 25 : (tongTienHang > 50000000 ? 15 : 0));
+            decimal voucherGiam = tongTienHang * phanTramGiam / 100;
 
             ViewBag.TongTienHang = tongTienHang;
             ViewBag.VoucherGiam = voucherGiam;
@@ -168,17 +120,26 @@ namespace cuahang.Controllers
 
             if (userId == null || !cart.Any()) return RedirectToAction("Login", "Account");
 
-            // 1. Tạo hóa đơn mới
+            // --- TÍNH TOÁN LẠI VOUCHER ĐỂ LƯU CHÍNH XÁC ---
+            decimal tongTienHang = cart.Sum(x => x.ThanhTien);
+            int phanTramGiam = tongTienHang > 100000000 ? 35 : (tongTienHang > 70000000 ? 25 : (tongTienHang > 50000000 ? 15 : 0));
+            decimal voucherGiam = tongTienHang * phanTramGiam / 100;
+            decimal tongPhaiTra = tongTienHang - voucherGiam;
+
+            // 1. Tạo hóa đơn mới và GÁN CÁC THÔNG TIN CÒN THIẾU
             var hoaDon = new HoaDon
             {
                 NgayDat = DateTime.Now,
                 UserId = userId.Value,
-                TongTien = cart.Sum(x => x.ThanhTien), // Tính tổng tiền sau voucher nếu cần
+                DiaChi = DiaChi,             // QUAN TRỌNG: Gán địa chỉ khách nhập
+                SoDienThoai = SoDienThoai,   // QUAN TRỌNG: Gán số điện thoại khách nhập
+                GiamGia = voucherGiam,       // QUAN TRỌNG: Lưu số tiền đã giảm
+                TongTien = tongPhaiTra,      // QUAN TRỌNG: Lưu số tiền cuối cùng sau khi trừ voucher
                 TrangThai = "Chờ xử lý"
             };
 
             _context.HoaDon.Add(hoaDon);
-            _context.SaveChanges(); // Lưu để lấy Id của HoaDon vừa tạo
+            _context.SaveChanges();
 
             // 2. Lưu chi tiết hóa đơn
             foreach (var item in cart)
