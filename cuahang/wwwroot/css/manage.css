@@ -107,3 +107,11 @@
     object-fit: cover;
     border-radius: 4px;
 }
+
+.mota-textarea {
+    resize: none;
+    overflow: hidden;
+    min-height: 38px;
+    transition: height 0.2s ease;
+    line-height: 1.5;
+}
