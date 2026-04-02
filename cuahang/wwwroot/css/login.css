@@ -10,7 +10,7 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); /*testing, somehow this doesnt affect the site???*/
+    background: linear-gradient(135deg, var(--primary-color), white, var(--secondary-color)); 
     min-height: 100vh;
 }
 
@@ -31,7 +31,6 @@ body {
 
 h2 {
     font-size: 34px;
-    font-weight: var(--weight-extra-bold);
     color: var(--primary-color);
     text-align: center;
     margin-bottom: 20px;
@@ -58,7 +57,7 @@ button {
     border: none;
     cursor: pointer;
     font-size: 16px;
-    font-weight: var(--weight-semibold);
+    font-weight: var(--fw-semibold);
     color: #fff;
     font-weight: 500;
     margin-bottom: 20px;
@@ -77,10 +76,15 @@ p {
     color: var(--text-color);
 }
 
+p .register-link{
+    color: var(--primary-color);
+    font-weight: var(--fw-semibold);
+}
+
 p a {
     color: var(--primary-color);
     text-decoration: none;
-    font-weight: var(--weight-bold);
+    font-weight: var(--fw-bold);
 }
 
 p a:hover {
@@ -97,9 +101,9 @@ p a:hover {
     font-size: 0.9em;
     color: var(--text-color);
     text-decoration: none;
-    font-weight: var(--weight-semibold);
+    font-weight: var(--fw-semibold);
 }
 .forgot-password-link a:hover {
     text-decoration: underline;
-    color: #5a78d6;
+    color: var(--secondary-color);
 }
