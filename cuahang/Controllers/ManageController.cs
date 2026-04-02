@@ -2,6 +2,9 @@
 using cuahang.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http; // Thêm để dùng Session
+using System;
+using System.Linq;
 
 public class ManageController : Controller
 {
@@ -11,16 +14,25 @@ public class ManageController : Controller
     {
         _db = db;
     }
+
+    // Hàm hỗ trợ kiểm tra quyền Admin (giữ logic từ đoạn 2)
+    private bool IsAdmin()
+    {
+        return HttpContext.Session.GetString("UserLevel") == "2";
+    }
+
     [HttpGet]
     public JsonResult GetRevenueData(string type)
     {
+        // Thêm kiểm tra quyền từ đoạn 2
+        if (!IsAdmin()) return Json(new { error = "Unauthorized" });
+
         var query = _db.HoaDon.AsQueryable();
         object labels = null;
         object values = null;
 
         if (type == "day")
         {
-            // Lấy doanh thu 7 ngày gần nhất
             var startDate = DateTime.Now.Date.AddDays(-6);
             var data = query.Where(h => h.NgayDat >= startDate)
                             .GroupBy(h => h.NgayDat.Date)
@@ -33,7 +45,6 @@ public class ManageController : Controller
         }
         else if (type == "month")
         {
-            // Lấy doanh thu các tháng trong năm hiện tại
             var data = query.Where(h => h.NgayDat.Year == DateTime.Now.Year)
                             .GroupBy(h => h.NgayDat.Month)
                             .Select(g => new { Month = g.Key, Total = g.Sum(h => h.TongTien) })
@@ -56,19 +67,17 @@ public class ManageController : Controller
 
         return Json(new { labels, values });
     }
+
     public IActionResult LichSuDonHangAdmin()
     {
-        // Kiểm tra quyền Admin (ví dụ qua lvID)
-        var lvID = HttpContext.Session.GetString("UserLevel");
-        if (lvID != "2") return Content("Bạn không có quyền truy cập");
+        // Cập nhật logic điều hướng từ đoạn 2
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
 
-        // 1. Lấy toàn bộ lịch sử đơn hàng của tất cả mọi người
         var tatCaDonHang = _db.HoaDon
-            .Include(h => h.User) // Để biết ai mua
+            .Include(h => h.User)
             .OrderByDescending(h => h.NgayDat)
             .ToList();
 
-        // 2. Thống kê doanh thu
         ViewBag.TongDoanhThu = tatCaDonHang.Sum(x => x.TongTien);
         ViewBag.TongDonHang = tatCaDonHang.Count;
 
@@ -78,6 +87,8 @@ public class ManageController : Controller
     [HttpPost]
     public IActionResult UpdateStatus(int id, string status)
     {
+        if (!IsAdmin()) return Json(new { success = false });
+
         var hoadon = _db.HoaDon.Find(id);
         if (hoadon != null)
         {
@@ -90,6 +101,7 @@ public class ManageController : Controller
 
     public IActionResult Manage()
     {
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
         var data = _db.SanPham.ToList();
         return View(data);
     }
@@ -97,11 +109,14 @@ public class ManageController : Controller
     [HttpPost]
     public IActionResult Create(SanPham sp)
     {
-        sp.HinhAnh = "0";
-        sp.DanhGia = "0";
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
+        if (string.IsNullOrEmpty(sp.HinhAnh)) sp.HinhAnh = "0";
+        if (string.IsNullOrEmpty(sp.DanhGia)) sp.DanhGia = "0";
 
         _db.SanPham.Add(sp);
         _db.SaveChanges();
+        TempData["Success"] = $"Đã thêm sản phẩm {sp.TenSP} thành công!";
         return RedirectToAction("Manage");
     }
 
@@ -125,48 +140,100 @@ public class ManageController : Controller
 
     public IActionResult Delete(int id)
     {
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
         var sp = _db.SanPham.Find(id);
         if (sp != null)
         {
+            string ten = sp.TenSP;
             _db.SanPham.Remove(sp);
             _db.SaveChanges();
+            TempData["Success"] = $"Đã xóa sản phẩm {ten}!";
         }
         return RedirectToAction("Manage");
     }
 
-
-
     public IActionResult Details(int id)
     {
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
         var sp = _db.SanPham.Find(id);
         return View(sp);
     }
 
-    //Trang danh sách bài báo trong Mangage
     public IActionResult News()
     {
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
         var news = _db.BaiBao.OrderByDescending(x => x.NgayDang).ToList();
         return View(news);
     }
 
-    // Xử lý thêm bài báo
     [HttpPost]
     public IActionResult CreateNews(BaiBao bb)
     {
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
+        bb.NgayDang = DateTime.Now; // Cập nhật ngày đăng tự động
         _db.BaiBao.Add(bb);
         _db.SaveChanges();
+        TempData["Success"] = "Đăng bài viết mới thành công!";
         return RedirectToAction("News");
     }
 
-    // Xóa bài báo
     public IActionResult DeleteNews(int id)
     {
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
         var bb = _db.BaiBao.Find(id);
         if (bb != null)
         {
             _db.BaiBao.Remove(bb);
             _db.SaveChanges();
+            TempData["Success"] = "Đã xóa bài viết!";
         }
         return RedirectToAction("News");
+    }
+
+    // --- CÁC PHẦN MỚI TỪ ĐOẠN 2 ĐƯỢC THÊM VÀO CUỐI ĐỂ TRÁNH SUNG ĐỘT ---
+
+    public IActionResult ManageKhuyenMai()
+    {
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
+        var list = _db.KhuyenMai.OrderByDescending(x => x.Id).ToList();
+        return View(list);
+    }
+
+    [HttpPost]
+    public IActionResult CreateKhuyenMai(KhuyenMai km)
+    {
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
+        if (km.NgayHetHang < DateTime.Now.Date)
+        {
+            TempData["Error"] = "Ngày hết hạn không thể ở quá khứ!";
+            return RedirectToAction("ManageKhuyenMai");
+        }
+
+        _db.KhuyenMai.Add(km);
+        _db.SaveChanges();
+        TempData["Success"] = $"Chúc mừng bạn đã tạo thành công voucher {km.KMName}!";
+        return RedirectToAction("ManageKhuyenMai");
+    }
+
+    public IActionResult DeleteKhuyenMai(int id)
+    {
+        if (!IsAdmin()) return RedirectToAction("Index", "Home");
+        var km = _db.KhuyenMai.Find(id);
+        if (km != null)
+        {
+            string code = km.KMName;
+            _db.KhuyenMai.Remove(km);
+            _db.SaveChanges();
+            TempData["Success"] = $"Đã xóa mã khuyến mãi {code}.";
+        }
+        return RedirectToAction("ManageKhuyenMai");
+    }
+
+    public IActionResult Logout()
+    {
+        // Xóa Session nếu cần hoặc chỉ đơn giản là redirect
+        HttpContext.Session.Clear();
+        return RedirectToAction("Index", "Home");
     }
 }
