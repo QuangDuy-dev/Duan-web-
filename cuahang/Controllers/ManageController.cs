@@ -123,8 +123,6 @@ public class ManageController : Controller
     [HttpPost]
     public IActionResult Edit([FromBody] SanPham sp)
     {
-        if (!IsAdmin()) return Json(new { success = false });
-
         var existing = _db.SanPham.Find(sp.Id);
         if (existing == null)
             return Json(new { success = false, message = "Không tìm thấy sản phẩm" });
