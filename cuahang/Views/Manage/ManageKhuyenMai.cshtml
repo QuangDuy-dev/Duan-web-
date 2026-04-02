@@ -69,12 +69,17 @@
                 <th>Giảm tối đa</th>
                 <th>Còn lại</th>
                 <th>Hết hạn</th>
+                <th>Trạng thái</th>
                 <th>Hành động</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var km in Model)
             {
+                // Logic kiểm tra trạng thái
+                var isExpired = km.NgayHetHang.Date < DateTime.Now.Date;
+                var isOutOfStock = km.KMSoluong <= 0;
+
                 <tr class="text-center align-middle">
                     <td class="fw-bold text-primary km-name">@km.KMName</td>
                     <td>@km.KMDieuKien.ToString("N0") đ</td>
@@ -91,6 +96,22 @@
                         }
                     </td>
                     <td>@km.NgayHetHang.ToString("dd/MM/yyyy")</td>
+
+                    <td>
+                        @if (isExpired)
+                        {
+                            <span class="badge bg-secondary">Hết hạn</span>
+                        }
+                        else if (isOutOfStock)
+                        {
+                            <span class="badge bg-danger">Hết hàng</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info text-dark">Đang hoạt động</span>
+                        }
+                    </td>
+
                     <td>
                         <a asp-action="DeleteKhuyenMai" asp-route-id="@km.Id" class="btn btn-outline-danger btn-sm"
                            onclick="return confirm('Bạn có chắc muốn xóa mã giảm giá này?')">
@@ -109,7 +130,6 @@
     <script>
         $(document).ready(function () {
             // 1. XỬ LÝ HIỂN THỊ THÔNG BÁO TỪ TEMP DATA
-            // Sử dụng Html.Raw để ngăn trình duyệt mã hóa ký tự tiếng Việt thành mã Hex
             var successMsg = '@Html.Raw(TempData["Success"])';
             var errorMsg = '@Html.Raw(TempData["Error"])';
 

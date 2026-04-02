@@ -98,6 +98,12 @@
                     <button type="submit" class="btn btn-danger btn-lg w-100 mt-4 py-3 fw-bold shadow-sm border-0">
                         ĐẶT HÀNG NGAY
                     </button>
+
+                    <div class="text-center mt-3">
+                        <a asp-controller="Cart" asp-action="Index" class="text-decoration-none text-muted small fw-bold">
+                            <i class="bi bi-arrow-left"></i> QUAY LẠI GIỎ HÀNG
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -120,15 +126,10 @@
                 data: { code: code },
                 success: function (res) {
                     if (res.success) {
-                        // Hiện thông báo thành công
                         $('#voucherMessage').text(res.message).removeClass('text-danger').addClass('text-success');
-
-                        // Hiện dòng giảm giá và cập nhật số tiền
                         $('#rowGiamGia').removeClass('d-none');
                         $('#txtGiamGia').text('- ' + res.discountAmount.toLocaleString() + ' đ');
                         $('#txtTongThanhToan').text(res.newTotal.toLocaleString() + ' đ');
-
-                        // Gán vào input ẩn để gửi lên Controller khi Submit form
                         $('#hiddenKMCode').val(code);
                         $('#hiddenGiamGiaValue').val(res.discountAmount);
                     } else {
@@ -149,7 +150,6 @@
             $('#hiddenGiamGiaValue').val(0);
         }
 
-        // Kiểm tra SDT trước khi gửi
         $('#checkoutForm').on('submit', function (e) {
             const sdt = $('input[name="SoDienThoai"]').val();
             if (!/^\d{10,11}$/.test(sdt)) {
