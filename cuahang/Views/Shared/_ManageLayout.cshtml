@@ -4,58 +4,75 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
-    <title>@ViewBag.Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Admin Panel</title>
 
     <link rel="stylesheet" href="~/css/manage.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-    <div class="topbar d-flex justify-content-between align-items-center px-3">
-        <div class="fw-bold">
-            <i class="bi bi-shop"></i> Manage Shop
+    <div class="topbar d-flex justify-content-between align-items-center px-3 shadow-sm">
+        <div class="fw-bold fs-5">
+            <i class="bi bi-shield-lock-fill"></i> Manage Shop
         </div>
 
-        <div class="position-absolute start-50 translate-middle-x">
-            <span class="fw-bold">
+        <div class="position-absolute start-50 translate-middle-x d-none d-md-block">
+            <span class="fw-bold text-primary">
                 Chào, @HttpContextAccessor.HttpContext.Session.GetString("UserName")!
             </span>
         </div>
 
-
-        <a asp-controller="Home" asp-action="Index" class="btn btn-light shadow-sm">
-            <i class="bi bi-arrow-left"></i> Trang chủ
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark btn-sm shadow-sm">
+            <i class="bi bi-house-door"></i> Trang chủ
         </a>
     </div>
 
     <div class="sidebar">
-        <h6 class="text-center text-white py-3">MENU</h6>
+        <div class="text-center text-white py-4 border-bottom border-secondary mb-2">
+            <i class="bi bi-person-circle fs-2"></i>
+            <h6 class="mt-2 mb-0 text-uppercase small">Quản trị viên</h6>
+        </div>
 
-        <a asp-controller="Manage" asp-action="Manage">
-            <i class="bi bi-bar-chart"></i>
-            <span> Manage</span>
+        <a asp-controller="Manage" asp-action="Manage" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Manage" ? "active" : "")">
+            <i class="bi bi-box-seam"></i>
+            <span> Sản phẩm</span>
         </a>
 
-        <a asp-controller="Manage" asp-action="News">
+        <a asp-controller="Manage" asp-action="News" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "News" ? "active" : "")">
             <i class="bi bi-newspaper"></i>
-            <span> News</span>
+            <span> Bài viết</span>
         </a>
-        <a asp-controller="Manage" asp-action="LichSuDonHangAdmin">
-            <i class="bi bi-graph-up"></i>
-            <span> Đơn hàng và doanh thu</span>
+
+        <a asp-controller="Manage" asp-action="ManageKhuyenMai" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "ManageKhuyenMai" ? "active" : "")">
+            <i class="bi bi-ticket-perforated"></i>
+            <span> Khuyến mãi</span>
+        </a>
+
+        <a asp-controller="Manage" asp-action="LichSuDonHangAdmin" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "LichSuDonHangAdmin" ? "active" : "")">
+            <i class="bi bi-cart-check"></i>
+            <span> Đơn hàng</span>
+        </a>
+
+        @* --- PHẦN SỬA ĐỔI: CHUYỂN VỀ TRANG CHỦ --- *@
+        <a asp-controller="Home" asp-action="Index" class="mt-5 text-danger border-top pt-3 d-block text-decoration-none">
+            <i class="bi bi-box-arrow-left"></i>
+            <span> Thoát về trang chủ</span>
         </a>
     </div>
 
-    <div class="content flex-grow-1">
+    <div class="content flex-grow-1 p-4">
         @RenderBody()
     </div>
 
-    <footer class="footer text-center">
-        &copy; 2026 - cuahang
+    <footer class="footer text-center py-3 border-top bg-light">
+        <div class="container text-muted small">
+            &copy; 2026 - Hệ thống quản lý <strong>Cửa hàng trực tuyến</strong>
+        </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -3,13 +3,13 @@
     public class KhuyenMai
     {
         public int Id { get; set; }
-        public string KMName { get; set; }
-        public string KMDieuKien { get; set; }
+        public string KMName { get; set; } // Mã code: ví dụ "GIAM30"
 
-        public int KMSoluong { get; set; }
-        public string HeSoGiam {  get; set; }
+        public decimal KMDieuKien { get; set; } // Số tiền tối thiểu để áp dụng (VD: 30,000,000)
+        public int KMSoluong { get; set; } // Số lượng mã còn lại trong kho
 
-        public string GiamToiDa { get; set; }
+        public int HeSoGiam { get; set; } // Phần trăm giảm (VD: 15 tương đương 15%)
+        public decimal GiamToiDa { get; set; } // Số tiền giảm tối đa (VD: 10,000,000)
 
         public DateTime NgayHetHang { get; set; }
     }

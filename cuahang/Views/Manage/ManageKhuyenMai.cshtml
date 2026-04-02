@@ -1,0 +1,145 @@
+﻿@model IEnumerable<cuahang.Models.KhuyenMai>
+@{
+    ViewBag.Title = "Quản lý khuyến mãi";
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+}
+
+<h3 class="mb-4">
+    <i class="bi bi-ticket-perforated"></i> Quản lý mã khuyến mãi
+</h3>
+
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-primary text-white fw-bold">
+        Thêm mã khuyến mãi mới
+    </div>
+    <div class="card-body border">
+        <form asp-action="CreateKhuyenMai" method="post" class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label small fw-bold">Tên mã (Code)</label>
+                <input name="KMName" class="form-control" placeholder="Ví dụ: GIAM20" required style="text-transform: uppercase;" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label small fw-bold">Điều kiện đơn hàng tối thiểu (VNĐ)</label>
+                <input name="KMDieuKien" type="number" class="form-control" placeholder="Ví dụ: 30000000" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Số lượng mã trong kho</label>
+                <input name="KMSoluong" type="number" class="form-control" placeholder="Số lượng" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Hệ số giảm (%)</label>
+                <input name="HeSoGiam" type="number" class="form-control" placeholder="Ví dụ: 15" min="1" max="100" required />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Giảm tối đa (VNĐ)</label>
+                <input name="GiamToiDa" type="number" class="form-control" placeholder="Ví dụ: 10000000" required />
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label small fw-bold">Ngày hết hạn</label>
+                <input name="NgayHetHang" type="date" class="form-control" required
+                       value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-success w-100 shadow-sm fw-bold">
+                    <i class="bi bi-plus-lg"></i> TẠO MÃ KHUYẾN MÃI
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="input-group mb-3 shadow-sm">
+    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+    <input type="text" id="searchKM" class="form-control" placeholder="Tìm kiếm tên mã..." />
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover shadow-sm bg-white" id="kmTable">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Mã</th>
+                <th>Điều kiện (>=)</th>
+                <th>Giảm (%)</th>
+                <th>Giảm tối đa</th>
+                <th>Còn lại</th>
+                <th>Hết hạn</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var km in Model)
+            {
+                <tr class="text-center align-middle">
+                    <td class="fw-bold text-primary km-name">@km.KMName</td>
+                    <td>@km.KMDieuKien.ToString("N0") đ</td>
+                    <td><span class="badge bg-success">@km.HeSoGiam%</span></td>
+                    <td>@km.GiamToiDa.ToString("N0") đ</td>
+                    <td>
+                        @if (km.KMSoluong <= 5)
+                        {
+                            <span class="text-danger fw-bold">@km.KMSoluong</span>
+                        }
+                        else
+                        {
+                            <span>@km.KMSoluong</span>
+                        }
+                    </td>
+                    <td>@km.NgayHetHang.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a asp-action="DeleteKhuyenMai" asp-route-id="@km.Id" class="btn btn-outline-danger btn-sm"
+                           onclick="return confirm('Bạn có chắc muốn xóa mã giảm giá này?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+            // 1. XỬ LÝ HIỂN THỊ THÔNG BÁO TỪ TEMP DATA
+            // Sử dụng Html.Raw để ngăn trình duyệt mã hóa ký tự tiếng Việt thành mã Hex
+            var successMsg = '@Html.Raw(TempData["Success"])';
+            var errorMsg = '@Html.Raw(TempData["Error"])';
+
+            if (successMsg) {
+                Swal.fire({
+                    title: 'SUCCESS!',
+                    text: successMsg,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#7066e0'
+                });
+            }
+
+            if (errorMsg) {
+                Swal.fire({
+                    title: 'ERROR!',
+                    text: errorMsg,
+                    icon: 'error',
+                    confirmButtonText: 'Đóng',
+                    confirmButtonColor: '#d33'
+                });
+            }
+
+            // 2. LOGIC TÌM KIẾM
+            $("#searchKM").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#kmTable tbody tr").filter(function () {
+                    $(this).toggle($(this).find(".km-name").text().toLowerCase().includes(value));
+                });
+            });
+        });
+    </script>
+}
