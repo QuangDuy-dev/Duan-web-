@@ -191,23 +191,35 @@ public class ManageController : Controller
 
         var fileName = GenerateNextWebpFileName(imageFolder);
         var destinationPath = Path.Combine(imageFolder, fileName);
-        var tempPath = Path.Combine(imageFolder, $"{Guid.NewGuid():N}.tmp");
+        var tempFolder = Path.Combine(Path.GetTempPath(), "cuahang-image-upload");
+        Directory.CreateDirectory(tempFolder);
+        var tempPath = Path.Combine(tempFolder, $"{Guid.NewGuid():N}.tmp");
 
-        using (var inputStream = imageFile.OpenReadStream())
-        using (var image = Image.Load(inputStream))
+        try
         {
-            image.SaveAsWebp(tempPath, new WebpEncoder
+            using (var inputStream = imageFile.OpenReadStream())
+            using (var image = Image.Load(inputStream))
             {
-                Quality = 85
-            });
-        }
+                image.SaveAsWebp(tempPath, new WebpEncoder
+                {
+                    Quality = 85
+                });
+            }
 
-        if (System.IO.File.Exists(destinationPath))
+            if (System.IO.File.Exists(destinationPath))
+            {
+                System.IO.File.Delete(destinationPath);
+            }
+
+            System.IO.File.Move(tempPath, destinationPath);
+        }
+        finally
         {
-            System.IO.File.Delete(destinationPath);
+            if (System.IO.File.Exists(tempPath))
+            {
+                System.IO.File.Delete(tempPath);
+            }
         }
-
-        System.IO.File.Move(tempPath, destinationPath);
 
         return (true, fileName, null);
     }
