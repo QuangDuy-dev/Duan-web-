@@ -112,7 +112,7 @@ public class ManageController : Controller
         if (!IsAdmin()) return RedirectToAction("Index", "Home");
 
         if (string.IsNullOrEmpty(sp.HinhAnh)) sp.HinhAnh = "0";
-        if (string.IsNullOrEmpty(sp.DanhGia)) sp.DanhGia = "0";
+        if (string.IsNullOrEmpty(sp.DanhGia)) sp.DanhGia = "0"; 
 
         _db.SanPham.Add(sp);
         _db.SaveChanges();
