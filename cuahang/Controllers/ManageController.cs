@@ -3,9 +3,12 @@ using cuahang.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http; // Thêm để dùng Session
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Webp;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 public class ManageController : Controller
 {
@@ -154,6 +157,8 @@ public class ManageController : Controller
         if (!uploadResult.Success)
             return Json(new { success = false, message = uploadResult.Message });
 
+        var previousImageUrl = existing.ImageUrl;
+
         existing.TenSP = sp.TenSP;
         existing.Gia = sp.Gia;
         existing.SoLuongTon = sp.SoLuongTon;
@@ -162,6 +167,11 @@ public class ManageController : Controller
         existing.MoTa = sp.MoTa;
 
         _db.SaveChanges();
+        if (!string.Equals(previousImageUrl, existing.ImageUrl, StringComparison.OrdinalIgnoreCase))
+        {
+            DeleteProductImageIfUnused(previousImageUrl);
+        }
+
         return Json(new { success = true, imageUrl = existing.ImageUrl });
     }
 
@@ -176,22 +186,46 @@ public class ManageController : Controller
         if (!allowedExtensions.Contains(extension))
             return (false, null, "Chỉ hỗ trợ file ảnh PNG, JPG, JPEG hoặc WEBP.");
 
-        var safeFileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
-        var normalizedBase = string.Concat(safeFileName.Where(ch => char.IsLetterOrDigit(ch) || ch == '-' || ch == '_'));
-        if (string.IsNullOrWhiteSpace(normalizedBase))
-            normalizedBase = "product";
-
-        var fileName = $"{normalizedBase}_{DateTime.Now:yyyyMMddHHmmssfff}{extension}";
         var imageFolder = Path.Combine(_environment.WebRootPath, "image");
         Directory.CreateDirectory(imageFolder);
 
+        var fileName = GenerateNextWebpFileName(imageFolder);
         var destinationPath = Path.Combine(imageFolder, fileName);
-        using (var stream = new FileStream(destinationPath, FileMode.Create))
+        var tempPath = Path.Combine(imageFolder, $"{Guid.NewGuid():N}.tmp");
+
+        using (var inputStream = imageFile.OpenReadStream())
+        using (var image = Image.Load(inputStream))
         {
-            imageFile.CopyTo(stream);
+            image.SaveAsWebp(tempPath, new WebpEncoder
+            {
+                Quality = 85
+            });
         }
 
+        if (System.IO.File.Exists(destinationPath))
+        {
+            System.IO.File.Delete(destinationPath);
+        }
+
+        System.IO.File.Move(tempPath, destinationPath);
+
         return (true, fileName, null);
+    }
+
+    private string GenerateNextWebpFileName(string imageFolder)
+    {
+        var pattern = new Regex(@"^IMG_(\d{3})\.WEBP$", RegexOptions.IgnoreCase);
+        var nextNumber = Directory
+            .EnumerateFiles(imageFolder, "IMG_*.WEBP")
+            .Select(Path.GetFileName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => pattern.Match(name!))
+            .Where(match => match.Success)
+            .Select(match => int.Parse(match.Groups[1].Value))
+            .DefaultIfEmpty(0)
+            .Max() + 1;
+
+        return $"IMG_{nextNumber:D3}.WEBP";
     }
 
     public IActionResult Delete(int id)
@@ -201,11 +235,33 @@ public class ManageController : Controller
         if (sp != null)
         {
             string ten = sp.TenSP;
+            string? imageUrl = sp.ImageUrl;
             _db.SanPham.Remove(sp);
             _db.SaveChanges();
+            DeleteProductImageIfUnused(imageUrl);
             TempData["Success"] = $"Đã xóa sản phẩm {ten}!";
         }
         return RedirectToAction("Manage");
+    }
+
+    private void DeleteProductImageIfUnused(string? imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            return;
+
+        var normalizedFileName = Path.GetFileName(imageUrl.Trim());
+        if (string.IsNullOrWhiteSpace(normalizedFileName))
+            return;
+
+        var isStillUsed = _db.SanPham.Any(x => x.ImageUrl == normalizedFileName);
+        if (isStillUsed)
+            return;
+
+        var imagePath = Path.Combine(_environment.WebRootPath, "image", normalizedFileName);
+        if (System.IO.File.Exists(imagePath))
+        {
+            System.IO.File.Delete(imagePath);
+        }
     }
 
     public IActionResult Details(int id)

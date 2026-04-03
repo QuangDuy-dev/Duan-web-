@@ -536,6 +536,18 @@ body.manage-body {
     text-overflow: ellipsis;
 }
 
+.current-image-note {
+    margin-top: 0.55rem;
+    color: #64748b;
+    font-size: 0.92rem;
+}
+
+.current-image-note span {
+    color: #0f172a;
+    font-weight: 700;
+    word-break: break-word;
+}
+
 .mota-textarea {
     resize: none;
     overflow: hidden;

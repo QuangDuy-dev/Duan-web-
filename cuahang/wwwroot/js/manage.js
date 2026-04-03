@@ -84,17 +84,44 @@ $(document).ready(function () {
         }
     }
 
-    function updateUploadFileName() {
+    function updateUploadFileName(overrideFileName) {
         var imageInput = document.getElementById("inputImageFile");
         var label = document.getElementById("imageUploadFilename");
+        var currentImageName = document.getElementById("currentImageName");
+        var currentImageUrl = overrideFileName || $("#currentImageUrl").val();
         if (!label) return;
+
+        if (currentImageName) {
+            currentImageName.textContent = currentImageUrl || "Chưa có ảnh";
+        }
 
         if (imageInput && imageInput.files && imageInput.files[0]) {
             label.textContent = imageInput.files[0].name;
             return;
         }
 
+        if (currentImageUrl) {
+            label.textContent = currentImageUrl;
+            return;
+        }
+
         label.textContent = defaultUploadText;
+    }
+
+    function extractImageFileName($row) {
+        var directValue = $row.attr("data-imageurl") || $row.data("imageurl") || "";
+        if (directValue) {
+            return String(directValue).trim();
+        }
+
+        var imageSrc = $row.find("img.product-img").attr("src") || "";
+        if (!imageSrc) {
+            return "";
+        }
+
+        var cleanSrc = imageSrc.split("?")[0].split("#")[0];
+        var segments = cleanSrc.split("/");
+        return segments.length ? segments[segments.length - 1] : "";
     }
 
     function updatePreview() {
@@ -287,6 +314,7 @@ $(document).ready(function () {
 
     $(document).on("click", ".product-row", function () {
         var $row = $(this);
+        var existingImageUrl = extractImageFileName($row);
 
         $(".product-row").removeClass("row-active");
         $row.addClass("row-active");
@@ -294,9 +322,9 @@ $(document).ready(function () {
         $("#inputTenSP").val($row.data("ten"));
         $("#inputGia").val($row.data("gia"));
         $("#inputSoLuong").val($row.data("soluong"));
-        $("#currentImageUrl").val($row.data("imageurl"));
+        $("#currentImageUrl").val(existingImageUrl);
         $("#inputImageFile").val("");
-        updateUploadFileName();
+        updateUploadFileName(existingImageUrl);
         $("#inputLoaiSp").val($row.data("loai"));
         $("#inputMoTa").val($row.data("mota"));
 
