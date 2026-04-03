@@ -274,5 +274,20 @@ namespace cuahang.Controllers
 
             return View(hoaDon);
         }
+
+        [HttpPost]
+        public IActionResult DanhGiaSanPham(int chiTietId, int soSao)
+        {
+            var chiTiet = _context.ChiTietHoaDon.Include(c => c.HoaDon).FirstOrDefault(c => c.Id == chiTietId);
+
+            // Chỉ cho đánh giá khi đơn hàng đã Hoàn thành
+            if (chiTiet != null && chiTiet.HoaDon.TrangThai == "Hoàn thành")
+            {
+                chiTiet.DiemDanhGia = soSao;
+                _context.SaveChanges();
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
     }
 }

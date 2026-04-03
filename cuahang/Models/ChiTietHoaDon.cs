@@ -8,6 +8,8 @@ namespace cuahang.Models
         public int SoLuong { get; set; }
         public decimal DonGia { get; set; }
 
+        public int? DiemDanhGia { get; set; } 
+
         [ForeignKey("HoaDon")]
         // Liên kết tới HoaDon
         public int HoaDonId { get; set; }
