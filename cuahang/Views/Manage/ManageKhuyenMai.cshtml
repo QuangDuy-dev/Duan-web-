@@ -21,22 +21,34 @@
 
             <div class="col-md-6">
                 <label class="form-label small fw-bold">Điều kiện đơn hàng tối thiểu (VNĐ)</label>
-                <input name="KMDieuKien" type="number" class="form-control" placeholder="Ví dụ: 30000000" required />
+                @* SỬA: Chặn nhập chữ và ký tự lạ *@
+                <input name="KMDieuKien" type="text" inputmode="numeric"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                       class="form-control" placeholder="Ví dụ: 30000000" required />
             </div>
 
             <div class="col-md-4">
                 <label class="form-label small fw-bold">Số lượng mã trong kho</label>
-                <input name="KMSoluong" type="number" class="form-control" placeholder="Số lượng" required />
+                @* SỬA: Chặn nhập chữ và ký tự lạ *@
+                <input name="KMSoluong" type="text" inputmode="numeric"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                       class="form-control" placeholder="Số lượng" required />
             </div>
 
             <div class="col-md-4">
                 <label class="form-label small fw-bold">Hệ số giảm (%)</label>
-                <input name="HeSoGiam" type="number" class="form-control" placeholder="Ví dụ: 15" min="1" max="100" required />
+                @* SỬA: Chặn nhập chữ và ký tự lạ *@
+                <input name="HeSoGiam" type="text" inputmode="numeric"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(Number(this.value) > 100) this.value = 100;"
+                       class="form-control" placeholder="Ví dụ: 15" required />
             </div>
 
             <div class="col-md-4">
                 <label class="form-label small fw-bold">Giảm tối đa (VNĐ)</label>
-                <input name="GiamToiDa" type="number" class="form-control" placeholder="Ví dụ: 10000000" required />
+                @* SỬA: Chặn nhập chữ và ký tự lạ *@
+                <input name="GiamToiDa" type="text" inputmode="numeric"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                       class="form-control" placeholder="Ví dụ: 10000000" required />
             </div>
 
             <div class="col-md-12">
@@ -76,7 +88,6 @@
         <tbody>
             @foreach (var km in Model)
             {
-                // Logic kiểm tra trạng thái
                 var isExpired = km.NgayHetHang.Date < DateTime.Now.Date;
                 var isOutOfStock = km.KMSoluong <= 0;
 

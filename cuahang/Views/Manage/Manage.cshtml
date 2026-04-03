@@ -35,12 +35,18 @@
 
                         <div class="col-12 col-md-6">
                             <label for="inputGia" class="form-label manage-label">Giá bán</label>
-                            <input id="inputGia" name="Gia" type="number" min="0" class="form-control manage-input" placeholder="Nhập giá sản phẩm" required />
+                            @* SỬA LẠI: Dùng oninput để xóa mọi ký tự không phải số (0-9) *@
+                            <input id="inputGia" name="Gia" type="text" inputmode="numeric"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                                   class="form-control manage-input" placeholder="Nhập giá sản phẩm" required />
                         </div>
 
                         <div class="col-12 col-md-6">
                             <label for="inputSoLuong" class="form-label manage-label">Số lượng tồn</label>
-                            <input id="inputSoLuong" name="SoLuongTon" type="number" min="0" class="form-control manage-input" placeholder="Nhập số lượng" required />
+                            @* SỬA LẠI: Dùng oninput để xóa mọi ký tự không phải số (0-9) *@
+                            <input id="inputSoLuong" name="SoLuongTon" type="text" inputmode="numeric"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                                   class="form-control manage-input" placeholder="Nhập số lượng" required />
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -56,7 +62,7 @@
 
                         <div class="col-12 col-md-6">
                             <label for="inputLoaiSp" class="form-label manage-label">Loại sản phẩm</label>
-                            <input id="inputLoaiSp" name="LoaiSp" class="form-control manage-input" placeholder="1 ss hoặc 2 ip, 1 là điện thoại, 2 là phụ kiện" />
+                            <input id="inputLoaiSp" name="LoaiSp" class="form-control manage-input" placeholder="1 là điện thoại, 2 là phụ kiện" />
                         </div>
 
                         <div class="col-12">
@@ -116,7 +122,7 @@
         <div class="manage-card-body pt-0">
             <div class="manage-note">
                 <i class="bi bi-info-circle"></i>
-                Chọn một dòng để nạp dữ liệu vào biểu mẫu. Dùng nút con mắt để xem chi tiết nhanh.
+                Chọn một dòng để nạp dữ liệu vào biểu mẫu.
             </div>
 
             <div class="table-shell">
@@ -148,7 +154,6 @@
                                     <td>
                                         <div class="product-name-cell">
                                             <span class="ten fw-semibold">@sp.TenSP</span>
-                                            <span class="text-muted small">Cập nhật trực tiếp từ bảng quản lý</span>
                                         </div>
                                     </td>
                                     <td class="fw-semibold">@sp.Gia.ToString("N0") đ</td>
@@ -157,19 +162,10 @@
                                     <td><img src="~/image/@sp.ImageUrl" class="product-img" alt="@sp.TenSP" /></td>
                                     <td>
                                         <div class="action-group">
-                                            <button type="button" class="btn btn-info btn-sm btn-details"
-                                                    onclick="event.stopPropagation()"
-                                                    data-id="@sp.Id"
-                                                    data-ten="@sp.TenSP"
-                                                    data-gia="@sp.Gia.ToString("N0")"
-                                                    data-soluong="@sp.SoLuongTon"
-                                                    data-mota="@sp.MoTa"
-                                                    data-imageurl="@sp.ImageUrl">
+                                            <button type="button" class="btn btn-info btn-sm btn-details" onclick="event.stopPropagation()">
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                            <a asp-action="Delete" asp-route-id="@sp.Id" class="btn btn-danger btn-sm btn-delete-product"
-                                               onclick="event.stopPropagation()"
-                                               data-product-name="@sp.TenSP">
+                                            <a asp-action="Delete" asp-route-id="@sp.Id" class="btn btn-danger btn-sm btn-delete-product" onclick="event.stopPropagation()">
                                                 <i class="bi bi-trash"></i>
                                             </a>
                                         </div>
@@ -178,12 +174,6 @@
                             }
                         </tbody>
                     </table>
-                </div>
-
-                <div id="emptySearchState" class="empty-search-state d-none">
-                    <i class="bi bi-search-heart"></i>
-                    <h3>Không tìm thấy sản phẩm phù hợp</h3>
-                    <p>Thử nhập từ khóa khác hoặc xóa bộ lọc tìm kiếm để xem lại toàn bộ danh sách.</p>
                 </div>
             </div>
         </div>
@@ -217,34 +207,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg"></i> Đóng
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="manageAlertModal" tabindex="-1" aria-labelledby="manageAlertModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content manage-alert-modal">
-            <div class="modal-header border-0 pb-0">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="manage-alert-icon">
-                        <i class="bi bi-exclamation-circle"></i>
-                    </div>
-                    <div>
-                        <p class="manage-card-kicker mb-1">Thông báo</p>
-                        <h5 class="modal-title fw-bold text-dark mb-0" id="manageAlertModalLabel">Kiểm tra lại thông tin</h5>
-                    </div>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body pt-3">
-                <p id="manageAlertMessage" class="manage-alert-message mb-0"></p>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">Đã hiểu</button>
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
@@ -254,25 +217,15 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content manage-alert-modal">
             <div class="modal-header border-0 pb-0">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="manage-alert-icon">
-                        <i class="bi bi-trash3"></i>
-                    </div>
-                    <div>
-                        <p class="manage-card-kicker mb-1">Xác nhận xóa</p>
-                        <h5 class="modal-title fw-bold text-dark mb-0" id="deleteProductModalLabel">Xóa sản phẩm này?</h5>
-                    </div>
-                </div>
+                <h5 class="modal-title fw-bold text-dark mb-0">Xác nhận xóa</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body pt-3">
-                <p class="manage-alert-message mb-0" id="deleteProductMessage">Sản phẩm sẽ bị xóa khỏi danh sách quản lý.</p>
+                <p class="manage-alert-message mb-0" id="deleteProductMessage">Sản phẩm sẽ bị xóa khỏi hệ thống.</p>
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Hủy</button>
-                <a href="#" class="btn btn-danger px-4" id="confirmDeleteProduct">
-                    <i class="bi bi-trash"></i> Xóa sản phẩm
-                </a>
+                <a href="#" class="btn btn-danger px-4" id="confirmDeleteProduct">Xóa sản phẩm</a>
             </div>
         </div>
     </div>
