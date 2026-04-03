@@ -34,7 +34,8 @@
                         <td>
                             <div class="d-flex" style="max-width: 120px;">
                                 <input type="number" class="form-control text-center quantity-input"
-                                       value="@(item?.SoLuong ?? 1)" min="1" data-id="@item?.SanPhamId">
+                                       value="@(item?.SoLuong ?? 1)" min="1" data-id="@item?.SanPhamId"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </div>
                         </td>
                         <td class="fw-bold item-total">@((item?.ThanhTien ?? 0).ToString("N0")) VNĐ</td>
@@ -57,7 +58,7 @@
             </h4>
             <div>
                 <a href="/" class="btn btn-secondary">Tiếp tục mua hàng</a>
-                
+
                 <a asp-controller="Cart" asp-action="Checkout" class="btn btn-success btn-lg">
                     Thanh toán ngay
                 </a>
@@ -72,14 +73,14 @@
         $(document).ready(function () {
 
             // 1. Xử lý cập nhật số lượng khi thay đổi ô input
-            $('.quantity-input').on('change', function () {
+            $('.quantity-input').on('change keyup', function () {
                 var id = $(this).data('id');
                 var qty = $(this).val();
                 var row = $(this).closest('tr');
 
-                if (qty < 1) {
-                    $(this).val(1);
-                    qty = 1;
+                // Chặn trường hợp xóa hết số hoặc nhập số âm
+                if (qty === "" || qty < 1) {
+                    return;
                 }
 
                 $.ajax({
@@ -88,7 +89,11 @@
                     data: { id: id, quantity: qty },
                     success: function (response) {
                         if (response.success) {
+                            // Cập nhật giá trị tổng của từng dòng
+                            // Lưu ý: Đảm bảo Controller trả về đúng tên thuộc tính totalItemPrice
                             row.find('.item-total').text(response.totalItemPrice + " VNĐ");
+
+                            // Cập nhật tổng cộng cuối trang
                             $('#cart-grand-total').text(response.grandTotal + " VNĐ");
 
                             if (typeof loadCartCount === "function") {
@@ -99,7 +104,7 @@
                         }
                     },
                     error: function () {
-                        alert("Không thể cập nhật số lượng!");
+                        console.log("Lỗi hệ thống khi cập nhật số lượng.");
                     }
                 });
             });
