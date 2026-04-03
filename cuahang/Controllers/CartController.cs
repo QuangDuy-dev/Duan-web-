@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace cuahang.Controllers
 {
@@ -12,7 +11,7 @@ namespace cuahang.Controllers
     {
         private readonly ApplicationDbContext _context = context;
 
-        // 1. Trang danh sách giỏ hàng (QUAN TRỌNG: Thiếu cái này sẽ bị lỗi 404)
+        // 1. Trang danh sách giỏ hàng
         public IActionResult Index()
         {
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? new List<CartItem>();
@@ -20,7 +19,7 @@ namespace cuahang.Controllers
             return View(cart);
         }
 
-        // 2. Lấy số lượng item trong giỏ (Dùng cho Header)
+        // 2. Lấy số lượng item trong giỏ
         public IActionResult GetCartCount()
         {
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
@@ -40,13 +39,11 @@ namespace cuahang.Controllers
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             var item = cart.FirstOrDefault(p => p.SanPhamId == id);
 
-            // Tìm sản phẩm trong kho để kiểm tra trước khi thêm
             var product = _context.SanPham.Find(id);
             if (product == null) return Json(new { success = false, message = "Sản phẩm không tồn tại!" });
 
             if (item != null)
             {
-                // Logic bổ sung: Kiểm tra nếu thêm 1 nữa có vượt quá kho không
                 if (item.SoLuong + 1 > product.SoLuongTon)
                 {
                     return Json(new { success = false, message = "Số lượng trong kho không đủ!" });
@@ -55,7 +52,6 @@ namespace cuahang.Controllers
             }
             else
             {
-                // Kiểm tra nếu sản phẩm còn hàng hay không
                 if (product.SoLuongTon <= 0)
                 {
                     return Json(new { success = false, message = "Sản phẩm đã hết hàng!" });
@@ -72,34 +68,35 @@ namespace cuahang.Controllers
             }
 
             HttpContext.Session.SetJson("GioHang", cart);
-
-            var pName = product.TenSP;
-            return Json(new { success = true, productName = pName, count = cart.Sum(x => x.SoLuong) });
+            return Json(new { success = true, productName = product.TenSP, count = cart.Sum(x => x.SoLuong) });
         }
 
-        // 4. Cập nhật số lượng trong trang giỏ hàng
+        // 4. CẬP NHẬT SỐ LƯỢNG (ĐÃ SỬA LỖI UNDEFINED)
         [HttpPost]
         public IActionResult UpdateQuantity(int id, int quantity)
         {
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             var item = cart.FirstOrDefault(p => p.SanPhamId == id);
+            string totalItemStr = "0";
 
             if (item != null)
             {
-                // Kiểm tra tồn kho khi người dùng thay đổi số lượng bằng tay
                 var product = _context.SanPham.Find(id);
                 if (product != null && quantity > product.SoLuongTon)
                 {
-                    quantity = product.SoLuongTon; // Chỉ cho phép đặt tối đa bằng số tồn kho
+                    quantity = product.SoLuongTon;
                 }
 
                 item.SoLuong = quantity > 0 ? quantity : 1;
+                totalItemStr = item.ThanhTien.ToString("N0"); // Lấy thành tiền của SP này
+
                 HttpContext.Session.SetJson("GioHang", cart);
             }
 
             return Json(new
             {
                 success = true,
+                totalItemPrice = totalItemStr, // TRẢ VỀ BIẾN NÀY ĐỂ HẾT LỖI UNDEFINED
                 grandTotal = cart.Sum(x => x.ThanhTien).ToString("N0"),
                 cartCount = cart.Sum(x => x.SoLuong)
             });
@@ -119,13 +116,12 @@ namespace cuahang.Controllers
             return Json(new { success = true, count = cart.Sum(x => x.SoLuong) });
         }
 
-        // 6. API Kiểm tra mã giảm giá (Dùng AJAX ở trang Checkout)
+        // 6. Kiểm tra mã giảm giá
         [HttpPost]
         public IActionResult CheckVoucher(string code)
         {
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             decimal totalAmount = cart.Sum(x => x.ThanhTien);
-
             var km = _context.KhuyenMai.FirstOrDefault(v => v.KMName == code);
 
             if (km == null) return Json(new { success = false, message = "Mã giảm giá không tồn tại!" });
@@ -152,12 +148,11 @@ namespace cuahang.Controllers
         {
             var cart = HttpContext.Session.GetJson<List<CartItem>>("GioHang") ?? [];
             if (!cart.Any()) return RedirectToAction("Index");
-
             ViewBag.TongTienHang = cart.Sum(x => x.ThanhTien);
             return View(cart);
         }
 
-        // 8. Xử lý đặt hàng và trừ kho khuyến mãi
+        // 8. Xử lý đặt hàng
         [HttpPost]
         public IActionResult ConfirmOrder(string DiaChi, string SoDienThoai, string KMCode, decimal GiamGiaValue)
         {
@@ -166,15 +161,10 @@ namespace cuahang.Controllers
 
             if (userId == null || !cart.Any()) return RedirectToAction("Login", "Account");
 
-            // Dùng Transaction để đảm bảo tính toàn vẹn: 
-            // Nếu một bước lỗi (như trừ kho lỗi), toàn bộ hóa đơn sẽ không được tạo.
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
-                    decimal tongTienHang = cart.Sum(x => x.ThanhTien);
-
-                    // Cập nhật số lượng mã khuyến mãi nếu có dùng
                     if (!string.IsNullOrEmpty(KMCode))
                     {
                         var km = _context.KhuyenMai.FirstOrDefault(v => v.KMName == KMCode);
@@ -185,7 +175,6 @@ namespace cuahang.Controllers
                         }
                     }
 
-                    // Lưu Hóa Đơn
                     var hoaDon = new HoaDon
                     {
                         NgayDat = DateTime.Now,
@@ -193,29 +182,24 @@ namespace cuahang.Controllers
                         DiaChi = DiaChi,
                         SoDienThoai = SoDienThoai,
                         GiamGia = GiamGiaValue,
-                        TongTien = tongTienHang - GiamGiaValue,
+                        TongTien = cart.Sum(x => x.ThanhTien) - GiamGiaValue,
                         TrangThai = "Chờ xử lý"
                     };
 
                     _context.HoaDon.Add(hoaDon);
                     _context.SaveChanges();
 
-                    // Lưu Chi Tiết Hóa Đơn VÀ CẬP NHẬT TRỪ KHO SẢN PHẨM
                     foreach (var item in cart)
                     {
-                        // 1. Tìm sản phẩm trong database
                         var product = _context.SanPham.Find(item.SanPhamId);
                         if (product == null || product.SoLuongTon < item.SoLuong)
                         {
-                            // Nếu hàng trong kho không đủ tại thời điểm nhấn thanh toán
-                            throw new Exception($"Sản phẩm {item.TenSP} đã hết hàng hoặc không đủ số lượng!");
+                            throw new Exception($"Sản phẩm {item.TenSP} đã hết hàng!");
                         }
 
-                        // 2. Trừ số lượng tồn kho
                         product.SoLuongTon -= item.SoLuong;
                         _context.SanPham.Update(product);
 
-                        // 3. Thêm chi tiết hóa đơn
                         _context.ChiTietHoaDon.Add(new ChiTietHoaDon
                         {
                             HoaDonId = hoaDon.Id,
@@ -226,14 +210,14 @@ namespace cuahang.Controllers
                     }
 
                     _context.SaveChanges();
-                    transaction.Commit(); // Xác nhận hoàn tất tất cả thay đổi
+                    transaction.Commit();
 
                     HttpContext.Session.Remove("GioHang");
                     return RedirectToAction("OrderSuccess");
                 }
                 catch (Exception ex)
                 {
-                    transaction.Rollback(); // Hủy bỏ nếu có bất kỳ lỗi nào xảy ra
+                    transaction.Rollback();
                     TempData["Error"] = ex.Message;
                     return RedirectToAction("Checkout");
                 }
