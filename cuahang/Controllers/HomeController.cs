@@ -13,8 +13,7 @@ namespace cuahang.Controllers
 
         public IActionResult Index(string keyword)
         {
-            var dsSanPham = _db.SanPham.AsQueryable();
-
+            var dsSanPham = _db.SanPham.Include(s => s.ChiTietHoaDons).AsQueryable();
             if (!string.IsNullOrEmpty(keyword))
             {
                 dsSanPham = dsSanPham.Where(p => p.TenSP.Contains(keyword));
