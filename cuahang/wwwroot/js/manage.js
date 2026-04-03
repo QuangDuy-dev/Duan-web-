@@ -145,3 +145,16 @@
     }
 
 });
+
+document.querySelectorAll('.btn-details').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        document.getElementById('detailTen').textContent = this.dataset.ten;
+        document.getElementById('detailGia').textContent = this.dataset.gia;
+        document.getElementById('detailSoLuong').textContent = this.dataset.soluong;
+        document.getElementById('detailMoTa').textContent = this.dataset.mota || '(Không có mô tả)';
+        document.getElementById('detailImg').src = '/image/' + this.dataset.imageurl;
+
+        var modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        modal.show();
+    });
+});

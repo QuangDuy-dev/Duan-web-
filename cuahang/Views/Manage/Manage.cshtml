@@ -102,10 +102,16 @@
                     <img src="~/image/@sp.ImageUrl" class="product-img" />
                 </td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@sp.Id" class="btn btn-info btn-sm"
-                       onclick="event.stopPropagation()">
+                    <button type="button" class="btn btn-info btn-sm btn-details"
+                            onclick="event.stopPropagation()"
+                            data-id="@sp.Id"
+                            data-ten="@sp.TenSP"
+                            data-gia="@sp.Gia.ToString("N0")"
+                            data-soluong="@sp.SoLuongTon"
+                            data-mota="@sp.MoTa"
+                            data-imageurl="@sp.ImageUrl">
                         <i class="bi bi-eye"></i>
-                    </a>
+                    </button>
                     <a asp-action="Delete" asp-route-id="@sp.Id" class="btn btn-danger btn-sm"
                        onclick="event.stopPropagation(); return confirm('Xóa sản phẩm này?')">
                         <i class="bi bi-trash"></i>
@@ -115,3 +121,28 @@
         }
     </tbody>
 </table>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="detailsModalLabel">
+                    <i class="bi bi-eye"></i> Chi tiết sản phẩm
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="detailImg" src="" width="200" class="mb-3 rounded shadow-sm" />
+                <h4 id="detailTen" class="fw-bold"></h4>
+                <p><strong>Giá:</strong> <span id="detailGia"></span> VNĐ</p>
+                <p><strong>Số lượng:</strong> <span id="detailSoLuong"></span></p>
+                <p class="text-start"><strong>Mô tả:</strong><br /><span id="detailMoTa" class="text-muted"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i> Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
