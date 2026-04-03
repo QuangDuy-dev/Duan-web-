@@ -3,16 +3,22 @@ using cuahang.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http; // Thêm để dùng Session
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Webp;
 using System;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 public class ManageController : Controller
 {
     private readonly ApplicationDbContext _db;
+    private readonly IWebHostEnvironment _environment;
 
-    public ManageController(ApplicationDbContext db)
+    public ManageController(ApplicationDbContext db, IWebHostEnvironment environment)
     {
         _db = db;
+        _environment = environment;
     }
 
     // Hàm hỗ trợ kiểm tra quyền Admin (giữ logic từ đoạn 2)
@@ -107,12 +113,26 @@ public class ManageController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(SanPham sp)
+    public IActionResult Create(SanPham sp, IFormFile? imageFile)
     {
         if (!IsAdmin()) return RedirectToAction("Index", "Home");
 
+        if (sp.Gia < 0 || sp.SoLuongTon < 0)
+        {
+            TempData["Error"] = "Giá và số lượng không được là số âm.";
+            return RedirectToAction("Manage");
+        }
+
+        var uploadResult = SaveProductImage(imageFile, sp.ImageUrl);
+        if (!uploadResult.Success)
+        {
+            TempData["Error"] = uploadResult.Message;
+            return RedirectToAction("Manage");
+        }
+
         if (string.IsNullOrEmpty(sp.HinhAnh)) sp.HinhAnh = "0";
-        if (string.IsNullOrEmpty(sp.DanhGia)) sp.DanhGia = "0"; 
+        if (string.IsNullOrEmpty(sp.DanhGia)) sp.DanhGia = "0";
+        sp.ImageUrl = uploadResult.FileName ?? sp.ImageUrl;
 
         _db.SanPham.Add(sp);
         _db.SaveChanges();
@@ -120,22 +140,104 @@ public class ManageController : Controller
         return RedirectToAction("Manage");
     }
 
+
     [HttpPost]
-    public IActionResult Edit([FromBody] SanPham sp)
+    public IActionResult Edit(SanPham sp, IFormFile? imageFile)
     {
+        if (!IsAdmin()) return Json(new { success = false, message = "Không có quyền truy cập" });
+
+        if (sp.Gia < 0 || sp.SoLuongTon < 0)
+            return Json(new { success = false, message = "Giá và số lượng không được là số âm" });
+
         var existing = _db.SanPham.Find(sp.Id);
         if (existing == null)
             return Json(new { success = false, message = "Không tìm thấy sản phẩm" });
 
+        var uploadResult = SaveProductImage(imageFile, existing.ImageUrl);
+        if (!uploadResult.Success)
+            return Json(new { success = false, message = uploadResult.Message });
+
+        var previousImageUrl = existing.ImageUrl;
+
         existing.TenSP = sp.TenSP;
         existing.Gia = sp.Gia;
         existing.SoLuongTon = sp.SoLuongTon;
-        existing.ImageUrl = sp.ImageUrl;
+        existing.ImageUrl = uploadResult.FileName ?? existing.ImageUrl;
         existing.LoaiSp = sp.LoaiSp;
         existing.MoTa = sp.MoTa;
 
         _db.SaveChanges();
-        return Json(new { success = true });
+        if (!string.Equals(previousImageUrl, existing.ImageUrl, StringComparison.OrdinalIgnoreCase))
+        {
+            DeleteProductImageIfUnused(previousImageUrl);
+        }
+
+        return Json(new { success = true, imageUrl = existing.ImageUrl });
+    }
+
+    private (bool Success, string? FileName, string? Message) SaveProductImage(IFormFile? imageFile, string? currentImageUrl)
+    {
+        if (imageFile == null || imageFile.Length == 0)
+            return (true, currentImageUrl, null);
+
+        var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".webp" };
+        var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+
+        if (!allowedExtensions.Contains(extension))
+            return (false, null, "Chỉ hỗ trợ file ảnh PNG, JPG, JPEG hoặc WEBP.");
+
+        var imageFolder = Path.Combine(_environment.WebRootPath, "image");
+        Directory.CreateDirectory(imageFolder);
+
+        var fileName = GenerateNextWebpFileName(imageFolder);
+        var destinationPath = Path.Combine(imageFolder, fileName);
+        var tempFolder = Path.Combine(Path.GetTempPath(), "cuahang-image-upload");
+        Directory.CreateDirectory(tempFolder);
+        var tempPath = Path.Combine(tempFolder, $"{Guid.NewGuid():N}.tmp");
+
+        try
+        {
+            using (var inputStream = imageFile.OpenReadStream())
+            using (var image = Image.Load(inputStream))
+            {
+                image.SaveAsWebp(tempPath, new WebpEncoder
+                {
+                    Quality = 85
+                });
+            }
+
+            if (System.IO.File.Exists(destinationPath))
+            {
+                System.IO.File.Delete(destinationPath);
+            }
+
+            System.IO.File.Move(tempPath, destinationPath);
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempPath))
+            {
+                System.IO.File.Delete(tempPath);
+            }
+        }
+
+        return (true, fileName, null);
+    }
+
+    private string GenerateNextWebpFileName(string imageFolder)
+    {
+        var pattern = new Regex(@"^IMG_(\d{3})\.WEBP$", RegexOptions.IgnoreCase);
+        var nextNumber = Directory
+            .EnumerateFiles(imageFolder, "IMG_*.WEBP")
+            .Select(Path.GetFileName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Select(name => pattern.Match(name!))
+            .Where(match => match.Success)
+            .Select(match => int.Parse(match.Groups[1].Value))
+            .DefaultIfEmpty(0)
+            .Max() + 1;
+
+        return $"IMG_{nextNumber:D3}.WEBP";
     }
 
     public IActionResult Delete(int id)
@@ -145,11 +247,33 @@ public class ManageController : Controller
         if (sp != null)
         {
             string ten = sp.TenSP;
+            string? imageUrl = sp.ImageUrl;
             _db.SanPham.Remove(sp);
             _db.SaveChanges();
+            DeleteProductImageIfUnused(imageUrl);
             TempData["Success"] = $"Đã xóa sản phẩm {ten}!";
         }
         return RedirectToAction("Manage");
+    }
+
+    private void DeleteProductImageIfUnused(string? imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            return;
+
+        var normalizedFileName = Path.GetFileName(imageUrl.Trim());
+        if (string.IsNullOrWhiteSpace(normalizedFileName))
+            return;
+
+        var isStillUsed = _db.SanPham.Any(x => x.ImageUrl == normalizedFileName);
+        if (isStillUsed)
+            return;
+
+        var imagePath = Path.Combine(_environment.WebRootPath, "image", normalizedFileName);
+        if (System.IO.File.Exists(imagePath))
+        {
+            System.IO.File.Delete(imagePath);
+        }
     }
 
     public IActionResult Details(int id)
@@ -236,4 +360,5 @@ public class ManageController : Controller
         HttpContext.Session.Clear();
         return RedirectToAction("Index", "Home");
     }
+
 }
