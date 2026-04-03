@@ -3,8 +3,6 @@ using cuahang.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http; // Thêm để dùng Session
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Webp;
 using System;
 using System.IO;
 using System.Linq;
@@ -180,16 +178,16 @@ public class ManageController : Controller
         if (imageFile == null || imageFile.Length == 0)
             return (true, currentImageUrl, null);
 
-        var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".webp" };
+        var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".jfif", ".webp" };
         var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
 
         if (!allowedExtensions.Contains(extension))
-            return (false, null, "Chỉ hỗ trợ file ảnh PNG, JPG, JPEG hoặc WEBP.");
+            return (false, null, "Chỉ hỗ trợ file ảnh PNG, JPG, JPEG, JFIF hoặc WEBP.");
 
-        var imageFolder = Path.Combine(_environment.WebRootPath, "image");
+        var imageFolder = GetProductImageFolder();
         Directory.CreateDirectory(imageFolder);
 
-        var fileName = GenerateNextWebpFileName(imageFolder);
+        var fileName = GenerateNextImageFileName(imageFolder, extension);
         var destinationPath = Path.Combine(imageFolder, fileName);
         var tempFolder = Path.Combine(Path.GetTempPath(), "cuahang-image-upload");
         Directory.CreateDirectory(tempFolder);
@@ -198,12 +196,9 @@ public class ManageController : Controller
         try
         {
             using (var inputStream = imageFile.OpenReadStream())
-            using (var image = Image.Load(inputStream))
+            using (var outputStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                image.SaveAsWebp(tempPath, new WebpEncoder
-                {
-                    Quality = 85
-                });
+                inputStream.CopyTo(outputStream);
             }
 
             if (System.IO.File.Exists(destinationPath))
@@ -224,11 +219,12 @@ public class ManageController : Controller
         return (true, fileName, null);
     }
 
-    private string GenerateNextWebpFileName(string imageFolder)
+    private string GenerateNextImageFileName(string imageFolder, string extension)
     {
-        var pattern = new Regex(@"^IMG_(\d{3})\.WEBP$", RegexOptions.IgnoreCase);
+        var normalizedExtension = extension.StartsWith(".") ? extension.ToUpperInvariant() : "." + extension.ToUpperInvariant();
+        var pattern = new Regex(@"^IMG_(\d{3})\.[A-Z0-9]+$", RegexOptions.IgnoreCase);
         var nextNumber = Directory
-            .EnumerateFiles(imageFolder, "IMG_*.WEBP")
+            .EnumerateFiles(imageFolder, "IMG_*.*")
             .Select(Path.GetFileName)
             .Where(name => !string.IsNullOrWhiteSpace(name))
             .Select(name => pattern.Match(name!))
@@ -237,7 +233,7 @@ public class ManageController : Controller
             .DefaultIfEmpty(0)
             .Max() + 1;
 
-        return $"IMG_{nextNumber:D3}.WEBP";
+        return $"IMG_{nextNumber:D3}{normalizedExtension}";
     }
 
     public IActionResult Delete(int id)
@@ -269,11 +265,22 @@ public class ManageController : Controller
         if (isStillUsed)
             return;
 
-        var imagePath = Path.Combine(_environment.WebRootPath, "image", normalizedFileName);
+        var imagePath = Path.Combine(GetProductImageFolder(), normalizedFileName);
         if (System.IO.File.Exists(imagePath))
         {
             System.IO.File.Delete(imagePath);
         }
+    }
+
+    private string GetProductImageFolder()
+    {
+        var webRootPath = _environment.WebRootPath;
+        if (!string.IsNullOrWhiteSpace(webRootPath))
+        {
+            return Path.Combine(webRootPath, "image");
+        }
+
+        return Path.Combine(_environment.ContentRootPath, "wwwroot", "image");
     }
 
     public IActionResult Details(int id)
