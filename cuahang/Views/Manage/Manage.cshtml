@@ -1,147 +1,278 @@
-﻿@model IEnumerable<cuahang.Models.SanPham>
+@using System.Linq
+@model IEnumerable<cuahang.Models.SanPham>
 @{
     ViewBag.Title = "Quản lý sản phẩm";
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    var products = Model?.ToList() ?? new List<cuahang.Models.SanPham>();
 }
 
-<h3 class="mb-4">
-    <i class="bi bi-box-seam"></i> Quản lý sản phẩm
-</h3>
-
-<div class="card mb-4 shadow-sm">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <span id="formTitle"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</span>
-        <button type="button" id="btnReset" class="btn btn-sm btn-light d-none">
-            <i class="bi bi-x-lg"></i> Hủy chỉnh sửa
-        </button>
-    </div>
-    <div class="card-body">
-        <form id="productForm" method="post" class="row g-3"
-              data-edit-url="@Url.Action("Edit", "Manage")"
-              data-create-url="@Url.Action("Create", "Manage")">
-            @Html.AntiForgeryToken()
-
-            <input type="hidden" id="editId" name="Id" value="0" />
-
-            <div class="col-12">
-                <input id="inputTenSP" name="TenSP" class="form-control" placeholder="Tên sản phẩm" required />
-            </div>
-
-            <div class="col-12">
-                <input id="inputGia" name="Gia" type="number" class="form-control" placeholder="Giá" required />
-            </div>
-
-            <div class="col-12">
-                <input id="inputSoLuong" name="SoLuongTon" type="number" class="form-control" placeholder="Số lượng" required />
-            </div>
-
-            <div class="col-12">
-                <input id="inputImageUrl" name="ImageUrl" class="form-control" placeholder="Tên ảnh" />
-            </div>
-
-            <div class="col-12">
-                <input id="inputLoaiSp" name="LoaiSp" class="form-control" placeholder="Loại nếu là điện thoại thì là 1, còn phụ kiện thì là 2, tên hãng ghi tắc hành 2 chữ: 1 ss, 2 ip" />
-            </div>
-
-            <div class="col-12">
-                <textarea id="inputMoTa" name="MoTa" class="form-control mota-textarea"
-                          placeholder="Mô tả (Shift+Enter để xuống dòng)"
-                          rows="1"></textarea>
-            </div>
-
-            <div class="col-12">
-                <button type="button" id="btnAction" class="btn btn-success w-100">
-                    <i class="bi bi-plus-lg"></i> Thêm sản phẩm
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="input-group mb-3">
-    <span class="input-group-text">
-        <i class="bi bi-search"></i>
-    </span>
-    <input type="text" id="searchBox" class="form-control" placeholder="Tìm sản phẩm" />
-</div>
-
-<p class="text-muted small mb-2"><i class="bi bi-info-circle"></i> Click vào hàng sản phẩm để chỉnh sửa thông tin</p>
-
-<table class="table table-bordered table-hover shadow-sm" id="productTable">
-    <thead class="table-dark text-center">
-        <tr>
-            <th>ID</th>
-            <th>Tên</th>
-            <th>Giá</th>
-            <th>SL</th>
-            <th>Loại</th>
-            <th>Ảnh</th>
-            <th>Hành động</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var sp in Model)
-        {
-            <tr class="text-center product-row"
-                style="cursor:pointer"
-                data-id="@sp.Id"
-                data-ten="@sp.TenSP"
-                data-gia="@sp.Gia"
-                data-soluong="@sp.SoLuongTon"
-                data-imageurl="@sp.ImageUrl"
-                data-loai="@sp.LoaiSp"
-                data-mota="@sp.MoTa">
-
-                <td>@sp.Id</td>
-                <td class="ten">@sp.TenSP</td>
-                <td>@sp.Gia.ToString("N0")</td>
-                <td>@sp.SoLuongTon</td>
-                <td>@sp.LoaiSp</td>
-                <td>
-                    <img src="~/image/@sp.ImageUrl" class="product-img" />
-                </td>
-                <td>
-                    <button type="button" class="btn btn-info btn-sm btn-details"
-                            onclick="event.stopPropagation()"
-                            data-id="@sp.Id"
-                            data-ten="@sp.TenSP"
-                            data-gia="@sp.Gia.ToString("N0")"
-                            data-soluong="@sp.SoLuongTon"
-                            data-mota="@sp.MoTa"
-                            data-imageurl="@sp.ImageUrl">
-                        <i class="bi bi-eye"></i>
+<div class="manage-dashboard space-y-6">
+    <section class="row g-4 align-items-stretch">
+        <div class="col-12 col-xl-7">
+            <div class="manage-card h-100">
+                <div class="manage-card-header">
+                    <div>
+                        <p class="manage-card-kicker">Biểu mẫu sản phẩm</p>
+                        <h2 class="manage-card-title" id="formTitle"><i class="bi bi-plus-circle"></i> Thêm sản phẩm mới</h2>
+                    </div>
+                    <button type="button" id="btnReset" class="btn btn-light btn-reset d-none">
+                        <i class="bi bi-arrow-counterclockwise"></i> Hủy chỉnh sửa
                     </button>
-                    <a asp-action="Delete" asp-route-id="@sp.Id" class="btn btn-danger btn-sm"
-                       onclick="event.stopPropagation(); return confirm('Xóa sản phẩm này?')">
-                        <i class="bi bi-trash"></i>
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                </div>
+
+                <div class="manage-card-body">
+                    <form id="productForm" method="post" enctype="multipart/form-data" class="row g-3"
+                          data-edit-url="@Url.Action("Edit", "Manage")"
+                          data-create-url="@Url.Action("Create", "Manage")">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="editId" name="Id" value="0" />
+                        <input type="hidden" id="currentImageUrl" name="ImageUrl" value="" />
+
+                        <div class="col-12">
+                            <label for="inputTenSP" class="form-label manage-label">Tên sản phẩm</label>
+                            <input id="inputTenSP" name="TenSP" class="form-control manage-input" placeholder="iPhone 15 Pro Max 256GB" required />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="inputGia" class="form-label manage-label">Giá bán</label>
+                            <input id="inputGia" name="Gia" type="number" min="0" class="form-control manage-input" placeholder="Nhập giá sản phẩm" required />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="inputSoLuong" class="form-label manage-label">Số lượng tồn</label>
+                            <input id="inputSoLuong" name="SoLuongTon" type="number" min="0" class="form-control manage-input" placeholder="Nhập số lượng" required />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="inputImageFile" class="form-label manage-label">Ảnh sản phẩm</label>
+                            <div class="image-upload-shell">
+                                <input id="inputImageFile" name="imageFile" type="file" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" class="image-upload-input" />
+                                <label for="inputImageFile" class="image-upload-label">
+                                    <span class="image-upload-button"><i class="bi bi-cloud-arrow-up"></i> Chọn tệp</span>
+                                    <span class="image-upload-filename" id="imageUploadFilename">Chưa chọn ảnh nào</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="inputLoaiSp" class="form-label manage-label">Loại sản phẩm</label>
+                            <input id="inputLoaiSp" name="LoaiSp" class="form-control manage-input" placeholder="1 ss hoặc 2 ip, 1 là điện thoại, 2 là phụ kiện" />
+                        </div>
+
+                        <div class="col-12">
+                            <label for="inputMoTa" class="form-label manage-label">Mô tả</label>
+                            <textarea id="inputMoTa" name="MoTa" class="form-control manage-input mota-textarea"
+                                      placeholder="Mô tả (Shift+Enter để xuống dòng)"
+                                      rows="1"></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="button" id="btnAction" class="btn btn-success btn-action-main w-100">
+                                <i class="bi bi-plus-lg"></i> Thêm sản phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-5">
+            <div class="manage-card h-100 preview-card">
+                <div class="manage-card-header border-0 pb-0">
+                    <div>
+                        <p class="manage-card-kicker">Xem trước</p>
+                    </div>
+                </div>
+
+                <div class="manage-card-body pt-3">
+                    <div class="preview-surface">
+                        <div class="preview-badge">Ảnh sản phẩm</div>
+                        <img id="formPreviewImg" src="https://placehold.co/720x520/e2e8f0/475569?text=Preview" alt="Xem trước sản phẩm" class="preview-image" />
+                        <div class="preview-content">
+                            <div class="preview-meta" id="previewCategory">Chưa phân loại</div>
+                            <h3 class="preview-title" id="previewName">Tên sản phẩm sẽ hiển thị ở đây</h3>
+                            <div class="preview-price" id="previewPrice">0 đ</div>
+                            <div class="preview-stock" id="previewStock">Số lượng tồn: 0</div>
+                            <p class="preview-description" id="previewDescription">Mô tả ngắn của sản phẩm sẽ được cập nhật theo nội dung bạn nhập trong biểu mẫu.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="manage-card">
+        <div class="manage-card-header gap-3 flex-wrap">
+            <div>
+                <p class="manage-card-kicker">Danh sách sản phẩm</p>
+            </div>
+
+            <div class="search-shell">
+                <span class="search-icon"><i class="bi bi-search"></i></span>
+                <input type="text" id="searchBox" class="form-control manage-input search-input" placeholder="Tìm theo tên sản phẩm" />
+            </div>
+        </div>
+
+        <div class="manage-card-body pt-0">
+            <div class="manage-note">
+                <i class="bi bi-info-circle"></i>
+                Chọn một dòng để nạp dữ liệu vào biểu mẫu. Dùng nút con mắt để xem chi tiết nhanh.
+            </div>
+
+            <div class="table-shell">
+                <div class="table-responsive">
+                    <table class="table align-middle" id="productTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Giá</th>
+                                <th>SL</th>
+                                <th>Loại</th>
+                                <th>Ảnh</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var sp in products)
+                            {
+                                <tr class="product-row"
+                                    data-id="@sp.Id"
+                                    data-ten="@sp.TenSP"
+                                    data-gia="@sp.Gia"
+                                    data-soluong="@sp.SoLuongTon"
+                                    data-imageurl="@sp.ImageUrl"
+                                    data-loai="@sp.LoaiSp"
+                                    data-mota="@sp.MoTa">
+                                    <td><span class="id-pill">#@sp.Id</span></td>
+                                    <td>
+                                        <div class="product-name-cell">
+                                            <span class="ten fw-semibold">@sp.TenSP</span>
+                                            <span class="text-muted small">Cập nhật trực tiếp từ bảng quản lý</span>
+                                        </div>
+                                    </td>
+                                    <td class="fw-semibold">@sp.Gia.ToString("N0") đ</td>
+                                    <td>@sp.SoLuongTon</td>
+                                    <td><span class="category-pill">@(string.IsNullOrWhiteSpace(sp.LoaiSp) ? "Chưa rõ" : sp.LoaiSp)</span></td>
+                                    <td><img src="~/image/@sp.ImageUrl" class="product-img" alt="@sp.TenSP" /></td>
+                                    <td>
+                                        <div class="action-group">
+                                            <button type="button" class="btn btn-info btn-sm btn-details"
+                                                    onclick="event.stopPropagation()"
+                                                    data-id="@sp.Id"
+                                                    data-ten="@sp.TenSP"
+                                                    data-gia="@sp.Gia.ToString("N0")"
+                                                    data-soluong="@sp.SoLuongTon"
+                                                    data-mota="@sp.MoTa"
+                                                    data-imageurl="@sp.ImageUrl">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <a asp-action="Delete" asp-route-id="@sp.Id" class="btn btn-danger btn-sm btn-delete-product"
+                                               onclick="event.stopPropagation()"
+                                               data-product-name="@sp.TenSP">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="emptySearchState" class="empty-search-state d-none">
+                    <i class="bi bi-search-heart"></i>
+                    <h3>Không tìm thấy sản phẩm phù hợp</h3>
+                    <p>Thử nhập từ khóa khác hoặc xóa bộ lọc tìm kiếm để xem lại toàn bộ danh sách.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
 
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="detailsModalLabel">
-                    <i class="bi bi-eye"></i> Chi tiết sản phẩm
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content product-detail-modal">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <p class="manage-card-kicker mb-2">Chi tiết sản phẩm</p>
+                    <h5 class="modal-title fw-bold text-dark" id="detailsModalLabel"><i class="bi bi-eye"></i> Xem nhanh thông tin</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <img id="detailImg" src="" width="200" class="mb-3 rounded shadow-sm" />
-                <h4 id="detailTen" class="fw-bold"></h4>
-                <p><strong>Giá:</strong> <span id="detailGia"></span> VNĐ</p>
-                <p><strong>Số lượng:</strong> <span id="detailSoLuong"></span></p>
-                <p class="text-start"><strong>Mô tả:</strong><br /><span id="detailMoTa" class="text-muted"></span></p>
+            <div class="modal-body pt-3">
+                <div class="detail-layout">
+                    <img id="detailImg" src="" alt="Ảnh sản phẩm" class="detail-image" />
+                    <div class="detail-info">
+                        <h4 id="detailTen" class="fw-bold mb-3"></h4>
+                        <div class="detail-badges">
+                            <span class="detail-chip"><i class="bi bi-cash"></i><span id="detailGia"></span> VNĐ</span>
+                            <span class="detail-chip"><i class="bi bi-box"></i>Còn <span id="detailSoLuong"></span> sản phẩm</span>
+                        </div>
+                        <div class="detail-description">
+                            <strong class="d-block mb-2">Mô tả</strong>
+                            <span id="detailMoTa" class="text-muted"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
                     <i class="bi bi-x-lg"></i> Đóng
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="manageAlertModal" tabindex="-1" aria-labelledby="manageAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content manage-alert-modal">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="manage-alert-icon">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </div>
+                    <div>
+                        <p class="manage-card-kicker mb-1">Thông báo</p>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="manageAlertModalLabel">Kiểm tra lại thông tin</h5>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <p id="manageAlertMessage" class="manage-alert-message mb-0"></p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">Đã hiểu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content manage-alert-modal">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="manage-alert-icon">
+                        <i class="bi bi-trash3"></i>
+                    </div>
+                    <div>
+                        <p class="manage-card-kicker mb-1">Xác nhận xóa</p>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="deleteProductModalLabel">Xóa sản phẩm này?</h5>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <p class="manage-alert-message mb-0" id="deleteProductMessage">Sản phẩm sẽ bị xóa khỏi danh sách quản lý.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Hủy</button>
+                <a href="#" class="btn btn-danger px-4" id="confirmDeleteProduct">
+                    <i class="bi bi-trash"></i> Xóa sản phẩm
+                </a>
             </div>
         </div>
     </div>

@@ -4,15 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http; // Thêm để dùng Session
 using System;
+using System.IO;
 using System.Linq;
 
 public class ManageController : Controller
 {
     private readonly ApplicationDbContext _db;
+    private readonly IWebHostEnvironment _environment;
 
-    public ManageController(ApplicationDbContext db)
+    public ManageController(ApplicationDbContext db, IWebHostEnvironment environment)
     {
         _db = db;
+        _environment = environment;
     }
 
     // Hàm hỗ trợ kiểm tra quyền Admin (giữ logic từ đoạn 2)
@@ -107,12 +110,26 @@ public class ManageController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(SanPham sp)
+    public IActionResult Create(SanPham sp, IFormFile? imageFile)
     {
         if (!IsAdmin()) return RedirectToAction("Index", "Home");
 
+        if (sp.Gia < 0 || sp.SoLuongTon < 0)
+        {
+            TempData["Error"] = "Giá và số lượng không được là số âm.";
+            return RedirectToAction("Manage");
+        }
+
+        var uploadResult = SaveProductImage(imageFile, sp.ImageUrl);
+        if (!uploadResult.Success)
+        {
+            TempData["Error"] = uploadResult.Message;
+            return RedirectToAction("Manage");
+        }
+
         if (string.IsNullOrEmpty(sp.HinhAnh)) sp.HinhAnh = "0";
         if (string.IsNullOrEmpty(sp.DanhGia)) sp.DanhGia = "0";
+        sp.ImageUrl = uploadResult.FileName ?? sp.ImageUrl;
 
         _db.SanPham.Add(sp);
         _db.SaveChanges();
@@ -120,22 +137,61 @@ public class ManageController : Controller
         return RedirectToAction("Manage");
     }
 
+
     [HttpPost]
-    public IActionResult Edit([FromBody] SanPham sp)
+    public IActionResult Edit(SanPham sp, IFormFile? imageFile)
     {
+        if (!IsAdmin()) return Json(new { success = false, message = "Không có quyền truy cập" });
+
+        if (sp.Gia < 0 || sp.SoLuongTon < 0)
+            return Json(new { success = false, message = "Giá và số lượng không được là số âm" });
+
         var existing = _db.SanPham.Find(sp.Id);
         if (existing == null)
             return Json(new { success = false, message = "Không tìm thấy sản phẩm" });
 
+        var uploadResult = SaveProductImage(imageFile, existing.ImageUrl);
+        if (!uploadResult.Success)
+            return Json(new { success = false, message = uploadResult.Message });
+
         existing.TenSP = sp.TenSP;
         existing.Gia = sp.Gia;
         existing.SoLuongTon = sp.SoLuongTon;
-        existing.ImageUrl = sp.ImageUrl;
+        existing.ImageUrl = uploadResult.FileName ?? existing.ImageUrl;
         existing.LoaiSp = sp.LoaiSp;
         existing.MoTa = sp.MoTa;
 
         _db.SaveChanges();
-        return Json(new { success = true });
+        return Json(new { success = true, imageUrl = existing.ImageUrl });
+    }
+
+    private (bool Success, string? FileName, string? Message) SaveProductImage(IFormFile? imageFile, string? currentImageUrl)
+    {
+        if (imageFile == null || imageFile.Length == 0)
+            return (true, currentImageUrl, null);
+
+        var allowedExtensions = new[] { ".png", ".jpg", ".jpeg", ".webp" };
+        var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+
+        if (!allowedExtensions.Contains(extension))
+            return (false, null, "Chỉ hỗ trợ file ảnh PNG, JPG, JPEG hoặc WEBP.");
+
+        var safeFileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
+        var normalizedBase = string.Concat(safeFileName.Where(ch => char.IsLetterOrDigit(ch) || ch == '-' || ch == '_'));
+        if (string.IsNullOrWhiteSpace(normalizedBase))
+            normalizedBase = "product";
+
+        var fileName = $"{normalizedBase}_{DateTime.Now:yyyyMMddHHmmssfff}{extension}";
+        var imageFolder = Path.Combine(_environment.WebRootPath, "image");
+        Directory.CreateDirectory(imageFolder);
+
+        var destinationPath = Path.Combine(imageFolder, fileName);
+        using (var stream = new FileStream(destinationPath, FileMode.Create))
+        {
+            imageFile.CopyTo(stream);
+        }
+
+        return (true, fileName, null);
     }
 
     public IActionResult Delete(int id)
@@ -236,4 +292,5 @@ public class ManageController : Controller
         HttpContext.Session.Clear();
         return RedirectToAction("Index", "Home");
     }
+
 }
