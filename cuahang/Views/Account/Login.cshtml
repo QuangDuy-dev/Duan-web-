@@ -3,8 +3,14 @@
     Layout = null;
 }
 
-<link rel="stylesheet" href="~/css/login.css" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true"  />
+</head>
 
+<body>
 <div class="container">
     <div class="form-box active">
         <form asp-action="Login" method="post">
@@ -17,11 +23,11 @@
                 <a asp-action="ForgotPassword">Forgot Password?</a>
             </div>
 
-            <button type="submit">Login</button>
+            <button class="btn" type="submit">Login</button>
 
             <p>
                 Don't have an account?
-                <a asp-action="Register">Register</a>
+                <a asp-action="Register" class="register-link">Register</a>
             </p>
         </form>
     </div>
@@ -51,3 +57,4 @@
         });
     </script>
 }
+</body>
