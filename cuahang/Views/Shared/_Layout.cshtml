@@ -18,13 +18,85 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 d-lg-none">
             <div class="container">
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">cuahang</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContentMobile">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="collapse navbar-collapse" id="navbarContentMobile">
+                    <hr class="d-sm-none my-2"> 
+                    <div class="d-flex align-items-center gap-2 mb-3 mb-sm-0 me-sm-3">
+                        <form class="d-flex flex-grow-1 flex-sm-grow-0" asp-controller="Home" asp-action="Index" method="get">
+                            <input class="form-control form-control-sm me-1" type="search" name="keyword" placeholder="Tìm..." style="max-width: 120px;" />
+                            <button class="btn btn-sm btn-outline-success" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
+
+                        @{
+                            var userLevel = Context.Session.GetString("UserLevel");
+                            var userid = Context.Session.GetString("UserId");
+                            var userName = Context.Session.GetString("UserName");
+                        }
+
+                        @if (userLevel == "2")
+                        {
+                            <a href="/Manage/Manage" class="btn btn-sm btn-warning">
+                                <i class="bi bi-gear"></i>
+                            </a>
+                        }
+
+                        @if (userName != null)
+                        {
+                            <a class="btn btn-sm btn-outline-danger" asp-controller="Account" asp-action="Logout" title="Thoát @userName">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="Account" asp-action="Login">
+                                <i class="bi bi-person-circle"></i>
+                            </a>
+                        }
+
+                        @if (userid != null)
+                        {
+                            <a class="btn btn-sm btn-primary position-relative" asp-controller="Cart" asp-action="Index">
+                                <i class="bi bi-cart3"></i>
+                                <span class="cart-count-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">0</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-secondary" onclick="requireLogin()">
+                                <i class="bi bi-cart3"></i>
+                            </button>
+                        }
+                    </div>
+
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="News" asp-action="Index">News</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Account" asp-action="LichSuDonHangUser">Lịch sử</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3 d-none d-lg-block">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">cuahang</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse-pc">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse navbar-collapse-pc d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1 align-items-center">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Trang chủ</a>
@@ -40,15 +112,12 @@
 
                     <div class="d-flex align-items-center">
                         <form class="d-flex me-3" asp-controller="Home" asp-action="Index" method="get">
-                        <input class="form-control me-2" type="search" name="keyword" placeholder="Tìm kiếm sản phẩm" />
+                            <input class="form-control me-2" type="search" name="keyword" placeholder="Tìm kiếm sản phẩm" />
                             <button class="btn btn-outline-success" type="submit">
-                         <i class="bi bi-search"></i>
-                          </button>
+                                <i class="bi bi-search"></i>
+                            </button>
                         </form>
 
-                        @{
-                            var userLevel = Context.Session.GetString("UserLevel");
-                        }
                         @if (userLevel == "2")
                         {
                             <a href="/Manage/Manage" class="btn btn-warning shadow-sm me-2">
@@ -68,30 +137,25 @@
                             <a class="nav-link text-dark me-2" asp-controller="Account" asp-action="Login">Đăng nhập</a>
                         }
 
-                        
-                        @{
-                            
-                            var userid = Context.Session.GetString("UserId");
-                        }
                         @* Nút Giỏ hàng với Badge *@
-                        @if (userid!=null)
+                        @if (userid != null)
                         {
-                        <a class="btn btn-primary position-relative" asp-controller="Cart" asp-action="Index"> 
-                            <i class="bi bi-cart3"></i> Giỏ hàng
-                            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                0
-                            </span>
+                            <a class="btn btn-primary position-relative" asp-controller="Cart" asp-action="Index"> 
+                                <i class="bi bi-cart3"></i> Giỏ hàng
+                                <span class="cart-count-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    0
+                                </span>
                             </a>
                         }
                         else
                         {
                             @* Khi chưa đăng nhập: Gọi hàm Javascript thông báo *@
-              <button class="btn btn-secondary position-relative" onclick="requireLogin()">
-                   <i class="bi bi-cart3"></i> Giỏ hàng
-                   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">
-                          0
-                   </span>
-             </button>
+                            <button class="btn btn-secondary position-relative" onclick="requireLogin()">
+                                <i class="bi bi-cart3"></i> Giỏ hàng
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">
+                                    0
+                                </span>
+                            </button>
                         }
                     </div>
                 </div>
@@ -143,125 +207,94 @@
     </div>
 
     <footer class="text-center text-lg-start bg-body-tertiary text-muted">
-  <!-- Section: Social media -->
-  <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
-    <!-- Left -->
-    <div class="me-5 d-none d-lg-block">
-      <span>Get connected with us on social networks:</span>
-    </div>
-    <!-- Left -->
-
-    <!-- Right -->
-    <div>
-      <a href="" class="me-4 text-reset"  href="https://www.facebook.com/profile.php?id=100029924774923">
-        <i class="fab fa-facebook-f"></i>
-        
-      </a>
-      <a href="" class="me-4 text-reset">
-        <i class="fab fa-twitter"></i>
-      </a>
-      <a href="" class="me-4 text-reset">
-        <i class="fab fa-google"></i>
-      </a>
-      <a href="" class="me-4 text-reset">
-        <i class="fab fa-instagram"></i>
-      </a>
-      <a href="" class="me-4 text-reset">
-        <i class="fab fa-linkedin"></i>
-      </a>
-      <a href="" class="me-4 text-reset">
-        <i class="fab fa-github"></i>
-      </a>
-    </div>
-    <!-- Right -->
-  </section>
-  <!-- Section: Social media -->
-
-  <!-- Section: Links  -->
-  <section class="">
-    <div class="container text-center text-md-start mt-5">
-      <!-- Grid row -->
-      <div class="row mt-3">
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
-          <!-- Content -->
-          <h6 class="text-uppercase fw-bold mb-4">
-            <i class="fas fa-gem me-3"></i>Công ty Trách Nhiệm Hữu Hạn Nhiều Thành Viên Shop GPS 
-          </h6>
-          <p>
-            Chúng tôi ở đây với sứ mệnh đưa các sản phẩm giá rẻ nhất thị trường và chất lượng đỉnh cao cho các bạn
-          </p>
+        <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
+            <div class="me-5 d-none d-lg-block">
+                <span>Get connected with us on social networks:</span>
+            </div>
+            <div>
+                <a href="" class="me-4 text-reset"  href="https://www.facebook.com/profile.php?id=100029924774923">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="" class="me-4 text-reset">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="" class="me-4 text-reset">
+                    <i class="fab fa-google"></i>
+                </a>
+                <a href="" class="me-4 text-reset">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="" class="me-4 text-reset">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="" class="me-4 text-reset">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+            </section>
+        <section class="">
+            <div class="container text-center text-md-start mt-5">
+                <div class="row mt-3">
+                    <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+                        <h6 class="text-uppercase fw-bold mb-4">
+                            <i class="fas fa-gem me-3"></i>Công ty Trách Nhiệm Hữu Hạn Nhiều Thành Viên Shop GPS 
+                        </h6>
+                        <p>
+                            Chúng tôi ở đây với sứ mệnh đưa các sản phẩm giá rẻ nhất thị trường và chất lượng đỉnh cao cho các bạn
+                        </p>
+                    </div>
+                    <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+                        <h6 class="text-uppercase fw-bold mb-4">
+                            Products
+                        </h6>
+                        <p>
+                            <a href="#!" class="text-reset">Điện thoại</a>
+                        </p>
+                        <p>
+                            <a href="#!" class="text-reset">Tai nghe</a>
+                        </p>
+                        <p>
+                            <a href="#!" class="text-reset">Linh kiện</a>
+                        </p>
+                        <p>
+                            <a href="#!" class="text-reset">Phụ kiện </a>
+                        </p>
+                    </div>
+                    <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+                        <h6 class="text-uppercase fw-bold mb-4">
+                            Useful links
+                        </h6>
+                        <p>
+                            <a href="#!" class="text-reset">Pricing</a>
+                        </p>
+                        <p>
+                            <a href="#!" class="text-reset">Settings</a>
+                        </p>
+                        <p>
+                            <a href="#!" class="text-reset">Orders</a>
+                        </p>
+                        <p>
+                            <a href="#!" class="text-reset">Help</a>
+                        </p>
+                    </div>
+                    <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+                        <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
+                        <p><i class="fas fa-home me-3"></i> 282 ,An Dương Vương , Thành phố Hồ Chí Minh  </p>
+                        <p>
+                            <i class="fas fa-envelope me-3"></i>
+                            ShopGPS@gmail.com
+                        </p>
+                        <p><i class="fas fa-phone me-3"></i> + 81 234 567 88</p>
+                        <p><i class="fas fa-print me-3"></i> + 81 234 567 89</p>
+                    </div>
+                    </div>
+                </div>
+        </section>
+        <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+            © 2026 Copyright:
+            <a class="text-reset fw-bold" href="#">Shop GPS</a>
         </div>
-        <!-- Grid column -->
-
-        <!-- Grid column -->
-        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4">
-            Products
-          </h6>
-          <p>
-            <a href="#!" class="text-reset">Điện thoại</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Tai nghe</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Linh kiện</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Phụ kiện </a>
-          </p>
-        </div>
-        <!-- Grid column -->
-
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4">
-            Useful links
-          </h6>
-          <p>
-            <a href="#!" class="text-reset">Pricing</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Settings</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Orders</a>
-          </p>
-          <p>
-            <a href="#!" class="text-reset">Help</a>
-          </p>
-        </div>
-        <!-- Grid column -->
-
-        <!-- Grid column -->
-        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
-          <p><i class="fas fa-home me-3"></i> 282 ,An Dương Vương , Thành phố Hồ Chí Minh  </p>
-          <p>
-            <i class="fas fa-envelope me-3"></i>
-            ShopGPS@gmail.com
-          </p>
-          <p><i class="fas fa-phone me-3"></i> + 81 234 567 88</p>
-          <p><i class="fas fa-print me-3"></i> + 81 234 567 89</p>
-        </div>
-        <!-- Grid column -->
-      </div>
-      <!-- Grid row -->
-    </div>
-  </section>
-  <!-- Section: Links  -->
-
-  <!-- Copyright -->
-  <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
-    © 2026 Copyright:
-    <a class="text-reset fw-bold" href="#">Shop GPS</a>
-  </div>
-  <!-- Copyright -->
-</footer>
+        </footer>
 
     <div class="call-modal" id="callModal">
         <div class="modal-box">
@@ -286,7 +319,7 @@
                 url: '/Cart/GetCartCount',
                 type: 'GET',
                 success: function (response) {
-                    $('#cart-count').text(response.count);
+                    $('.cart-count-badge').text(response.count);
                 },
                 error: function () {
                     console.log("Không thể tải số lượng giỏ hàng.");
@@ -301,24 +334,24 @@
     </script>
 
     <script>
-    function requireLogin() {
-        Swal.fire({
-            title: 'Bạn chưa đăng nhập!',
-            text: "Vui lòng đăng nhập để xem giỏ hàng và mua sắm.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#aaa',
-            confirmButtonText: 'Đăng nhập ngay',
-            cancelButtonText: 'Để sau'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Chuyển hướng sang trang đăng nhập của bạn
-                window.location.href = '/Account/Login'; 
-            }
-        })
-    }
-</script>
+        function requireLogin() {
+            Swal.fire({
+                title: 'Bạn chưa đăng nhập!',
+                text: "Vui lòng đăng nhập để xem giỏ hàng và mua sắm.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#aaa',
+                confirmButtonText: 'Đăng nhập ngay',
+                cancelButtonText: 'Để sau'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Chuyển hướng sang trang đăng nhập của bạn
+                    window.location.href = '/Account/Login'; 
+                }
+            })
+        }
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
