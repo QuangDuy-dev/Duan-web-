@@ -4,9 +4,9 @@
     ViewData["Title"] = Model.TieuDe;
 }
 
-<div class="container mt-5">
+<div class="container mt-3 mt-md-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-12 col-md-10 col-lg-8">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a asp-action="Index">Tin tức</a></li>
@@ -14,7 +14,7 @@
                 </ol>
             </nav>
 
-            <h1 class="display-4">@Model.TieuDe</h1>
+            <h1 class="display-4 text-break">@Model.TieuDe</h1>
             <p class="text-muted">Đăng ngày: @Model.NgayDang?.ToString("dd/MM/yyyy HH:mm")</p>
             <hr />
 
@@ -23,11 +23,12 @@
                 <div class="text-center mb-4">
                     <img src="@(string.IsNullOrEmpty(Model.HinhAnh) || Model.HinhAnh == "0" ? "/image/default-news.webp" : Model.HinhAnh)"
                          class="img-fluid rounded shadow-sm"
-                         style="max-height: 500px; object-fit: contain;" />
+                         style="max-height: 500px; object-fit: contain;" 
+                         alt="@Model.TieuDe" />
                 </div>
             }
 
-            <div class="news-content" style="white-space: pre-line; line-height: 1.8; font-size: 1.1rem;">
+            <div class="news-content text-break" style="white-space: pre-line; line-height: 1.8; font-size: 1.1rem;">
                 @Model.NoiDung
             </div>
 

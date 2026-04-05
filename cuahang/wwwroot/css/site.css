@@ -1,11 +1,15 @@
 ﻿:root {
     /* Colour Palette */
     --primary-color: #003063;
-    --secondary-color: #18bc9c;
-    --background-color: #f4f7f6;
-    --border-color:#1827ac;
-    --text-color: #22272c;
+    --secondary-color: #a0522d;
+    --background-color: #f4f9ff;
+    --border-color:#cbd5e1;
+    --text-color: #1e293b;
     --danger-color: #e74c3c;
+    --success-color:#1e8449;
+    --info-color:#3498db;
+    --warning-color:#d4ac0d;
+    
 
     /* Fonts */
     --main-font: 'Open Sans', sans-serif;
@@ -28,11 +32,13 @@ html {
 h1 {
     font-family: var(--main-font);
     font-weight: var(--fw-extra-bold);
+    color: var(--primary-color);
 }
 
 h2, h3 {
     font-family: var(--main-font);
     font-weight: var(--fw-bold);
+    color: var(--primary-color);
 }
 
 h4, h5 {
@@ -40,10 +46,6 @@ h4, h5 {
     font-weight: var(--fw-bold);
     text-transform: uppercase;
     letter-spacing: 1px;
-}
-
-.navbar .nav-link.login-link {
-    color: var(--secondary-color) !important;
 }
 
 .btn {
@@ -68,16 +70,17 @@ h4, h5 {
 
 .navbar .nav-link, 
 .btn-outline-success, 
-.btn-outline-danger {
+.btn-outline-danger, .btn-warning:hover {
     transition: all 0.3s ease;
     font-family: var(--main-font);
     font-weight: var(--fw-semibold);
     border-radius: 4px; 
+    color: white !important;
 }
 
 .navbar .nav-link:hover, 
 .btn-outline-success:hover, 
-.btn-outline-danger:hover {
+.btn-outline-danger:hover, .btn-warning:hover {
     color: white !important;
     background-color: var(--secondary-color) !important;
     border-color: var(--secondary-color) !important;
@@ -90,16 +93,21 @@ h4, h5 {
     background-color: transparent !important; 
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary, .btn-secondary, .btn-mobile-login {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
     font-weight: var(--fw-bold);
 }
 
-.btn-primary:hover, .btn-secondary:hover {
+.btn-primary:hover, .btn-secondary:hover, .btn-mobile-login:hover {
     background-color: var(--secondary-color);
     border-color: var(--secondary-color);
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--secondary-color);
+}
+
+.navbar-toggler{
+    color: white;
+    border-color: white !important;
 }
 
 .btn-outline-success, .btn-outline-danger {
@@ -110,6 +118,17 @@ h4, h5 {
 html {
     position: relative;
     min-height: 100%;
+}
+title{
+    color: var(--secondary-color);
+    font-weight: var(--fw-extra-bold);
+}
+
+header{
+  background-color: #0060c7 !important; 
+}
+header nav {
+    background-color: transparent !important;
 }
 
 body {

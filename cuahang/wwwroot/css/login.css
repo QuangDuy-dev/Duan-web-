@@ -10,9 +10,31 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, var(--primary-color), gray, var(--secondary-color)); 
+    background: linear-gradient(135deg, var(--primary-color), var(--background-color), var(--secondary-color)); 
     min-height: 100vh;
 }
+
+.back-home {
+            position: fixed;
+            font: var(--main-font);
+            text-decoration: none;
+            top: 20px;
+            left: 20px;
+            padding: 8px 15px;
+            background-color: var(--background-color);
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: var(--fw-bold);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 1000;
+        }
+
+        .back-home:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            color: #fff;
+            transform: translateX(-3px);
+        }
 
 .container {
     display: flex;
@@ -97,13 +119,13 @@ p a:hover {
     margin-bottom: 15px;
 }
 
-.forgot-password-link a {
+.forgot-password-link a, .back-link{
     font-size: 0.9em;
     color: var(--text-color);
     text-decoration: none;
     font-weight: var(--fw-semibold);
 }
-.forgot-password-link a:hover {
+.forgot-password-link a:hover, .back-link:hover {
     text-decoration: underline;
     color: var(--secondary-color);
 }

@@ -18,7 +18,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 d-lg-none">
+        <nav class="navbar navbar-expand-sm navbar-dark border-bottom box-shadow mb-3 d-lg-none">
             <div class="container">
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">cuahang</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContentMobile">
@@ -52,8 +52,8 @@
                         }
                         else
                         {
-                            <a class="btn btn-sm btn-outline-primary" asp-controller="Account" asp-action="Login">
-                                <i class="bi bi-person-circle"></i>
+                            <a class="btn btn-sm btn-outline-primary btn-mobile-login" asp-controller="Account" asp-action="Login">
+                                <i class="bi bi-person-circle text-white"></i>
                             </a>
                         }
 
@@ -94,11 +94,11 @@
             </div>
         </nav>
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3 d-none d-lg-block">
+        <nav class="navbar navbar-expand-lg navbar-light border-bottom box-shadow mb-3 d-none d-lg-block">
             <div class="container">
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">cuahang</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse-pc">
-                    <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon border-white"></span>
                 </button>
                 <div class="navbar-collapse collapse navbar-collapse-pc d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1 align-items-center">
@@ -116,16 +116,18 @@
 
                     <div class="d-flex align-items-center">
                         <form class="d-flex me-3" asp-controller="Home" asp-action="Index" method="get">
-                            <input class="form-control me-2" type="search" name="keyword" placeholder="Tìm kiếm sản phẩm" />
-                            <button class="btn btn-outline-success" type="submit">
-                                <i class="bi bi-search"></i>
-                            </button>
+                            <div class="input-group">
+                                <input class="form-control" type="search" name="keyword" placeholder="Tìm kiếm..." aria-label="Search">
+                                <button class="btn btn-outline-secondary bg-white border-start-0" type="submit" style="color: gray; border-color: #ced4da;">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
                         </form>
 
                         @if (userLevel == "2")
                         {
                             <a href="/Manage/Manage" class="btn btn-warning shadow-sm me-2">
-                                <i class="bi bi-gear"></i>
+                                <i class="bi bi-gear text-dark"></i>
                             </a>
                         }
 
@@ -210,62 +212,45 @@
         </li>
     </div>
 
-    footer class="text-center text-lg-start bg-body-tertiary text-muted">
-  <!-- Section: Social media -->
-  <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
-    <!-- Left -->
+    <footer class="text-center text-md-start bg-body-tertiary text-muted">
+  <section class="d-flex justify-content-center justify-content-lg-between p-3 p-md-4 border-bottom flex-wrap">
     <div class="me-5 d-none d-lg-block">
       <span>Get connected with us on social networks:</span>
     </div>
-    <!-- Left -->
-
-    <!-- Right -->
-    <div>
-      <a href="" class="me-4 text-reset"  href="https://www.facebook.com/profile.php?id=100029924774923">
+    <div class="d-flex flex-wrap justify-content-center gap-3 gap-md-4">
+      <a href="https://www.facebook.com/profile.php?id=100029924774923" class="text-reset">
         <i class="fab fa-facebook-f"></i>
-        
       </a>
-      <a href="" class="me-4 text-reset">
+      <a href="#!" class="text-reset">
         <i class="fab fa-twitter"></i>
       </a>
-      <a href="" class="me-4 text-reset">
+      <a href="#!" class="text-reset">
         <i class="fab fa-google"></i>
       </a>
-      <a href="" class="me-4 text-reset">
+      <a href="#!" class="text-reset">
         <i class="fab fa-instagram"></i>
       </a>
-      <a href="" class="me-4 text-reset">
+      <a href="#!" class="text-reset">
         <i class="fab fa-linkedin"></i>
       </a>
-      <a href="" class="me-4 text-reset">
+      <a href="#!" class="text-reset">
         <i class="fab fa-github"></i>
       </a>
     </div>
-    <!-- Right -->
-  </section>
-  <!-- Section: Social media -->
-
-  <!-- Section: Links  -->
+    </section>
   <section class="">
-    <div class="container text-center text-md-start mt-5">
-      <!-- Grid row -->
+    <div class="container text-center text-md-start mt-4 mt-md-5">
       <div class="row mt-3">
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
-          <!-- Content -->
-          <h6 class="text-uppercase fw-bold mb-4">
-            <i class="fas fa-gem me-3"></i>Công ty Trách Nhiệm Hữu Hạn Nhiều Thành Viên Shop GPS 
+        <div class="col-12 col-md-4 col-lg-4 col-xl-3 mx-auto mb-4">
+          <h6 class="text-uppercase fw-bold mb-3 mb-md-4 text-break">
+            <i class="fas fa-gem me-2 me-md-3"></i>Công ty TNHH Nhiều Thành Viên Shop GPS 
           </h6>
-          <p>
+          <p class="text-break">
             Chúng tôi ở đây với sứ mệnh đưa các sản phẩm giá rẻ nhất thị trường và chất lượng đỉnh cao cho các bạn
           </p>
         </div>
-        <!-- Grid column -->
-
-        <!-- Grid column -->
-        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4">
+        <div class="col-6 col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+          <h6 class="text-uppercase fw-bold mb-3 mb-md-4">
             Products
           </h6>
           <p>
@@ -281,12 +266,8 @@
             <a href="#!" class="text-reset">Phụ kiện </a>
           </p>
         </div>
-        <!-- Grid column -->
-
-        <!-- Grid column -->
-        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4">
+        <div class="col-6 col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+          <h6 class="text-uppercase fw-bold mb-3 mb-md-4">
             Useful links
           </h6>
           <p>
@@ -302,34 +283,24 @@
             <a href="#!" class="text-reset">Help</a>
           </p>
         </div>
-        <!-- Grid column -->
-
-        <!-- Grid column -->
-        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
-          <!-- Links -->
-          <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
-          <p><i class="fas fa-home me-3"></i> 282 ,An Dương Vương , Thành phố Hồ Chí Minh  </p>
-          <p>
-            <i class="fas fa-envelope me-3"></i>
+        <div class="col-12 col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+          <h6 class="text-uppercase fw-bold mb-3 mb-md-4">Contact</h6>
+          <p><i class="fas fa-home me-2 me-md-3"></i> 282, An Dương Vương, TP.HCM</p>
+          <p class="text-break">
+            <i class="fas fa-envelope me-2 me-md-3"></i>
             ShopGPS@gmail.com
           </p>
-          <p><i class="fas fa-phone me-3"></i> + 81 234 567 88</p>
-          <p><i class="fas fa-print me-3"></i> + 81 234 567 89</p>
+          <p><i class="fas fa-phone me-2 me-md-3"></i> + 81 234 567 88</p>
+          <p><i class="fas fa-print me-2 me-md-3"></i> + 81 234 567 89</p>
         </div>
-        <!-- Grid column -->
+        </div>
       </div>
-      <!-- Grid row -->
-    </div>
   </section>
-  <!-- Section: Links  -->
-
-  <!-- Copyright -->
-  <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+  <div class="text-center p-3 p-md-4" style="background-color: rgba(0, 0, 0, 0.05);">
     © 2026 Copyright:
     <a class="text-reset fw-bold" href="#">Shop GPS</a>
   </div>
-  <!-- Copyright -->
-</footer>
+  </footer>
 
     <div class="call-modal" id="callModal">
         <div class="modal-box">

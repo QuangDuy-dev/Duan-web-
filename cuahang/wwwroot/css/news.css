@@ -45,6 +45,18 @@ h2 {
     transform: scale(1.05);
 }
 
+.news-card-excerpt {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        -webkit-line-clamp: 2;
+    }
+@media (min-width: 768px) {
+    .news-card-excerpt {
+        -webkit-line-clamp: 5;
+    }
+}
+
 @media (max-width: 576px) {
     .news-card-title {
         min-height: auto; 
