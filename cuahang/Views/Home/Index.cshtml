@@ -47,7 +47,7 @@
                     <div class="card-body d-flex flex-column p-2 p-sm-3">
                         <h6 class="card-title fw-bold text-truncate mobile-title text-center">@(item?.TenSP ?? "Sản phẩm chưa có tên")</h6>
                         
-                        <p class="card-text text-muted small text-truncate-2 d-none d-sm-block text-center">@(item?.MoTa ?? "Không có mô tả")</p>
+                        <p class="card-text text-muted small text-truncate-2 text-center">@(item?.MoTa ?? "Không có mô tả")</p>
                         
                         @{
                             var ratings = item.ChiTietHoaDons?.Where(c => c.DiemDanhGia > 0).ToList()
@@ -56,7 +56,7 @@
                             double avgRating = ratings.Any() ? ratings.Average(c => c.DiemDanhGia.Value) : 0;
                         }
 
-                        <div class="mb-2 text-center text-sm-center text-start">
+                        <div class="mb-2 text-center d-none d-sm-block">
                             @if (ratings.Any())
                             {
                                 <span class="text-warning">
@@ -72,10 +72,26 @@
                             }
                         </div>
 
-                        <div class="mt-auto d-flex flex-row flex-sm-column justify-content-between align-items-center">
-                            <h5 class="text-danger mb-0 mb-sm-2 product-price">
-                                @((item?.Gia ?? 0).ToString("N0"))<span class="small d-none d-sm-inline"> VNĐ</span><span class="small d-sm-none">đ</span>
-                            </h5>
+                        <div class="mt-auto d-flex flex-column flex-sm-column align-items-center">
+                            
+                        <div class="d-flex align-items-center flex-sm-column mobile-price-rating-container">
+                            <div class="d-flex align-items-center flex-sm-column gap-2 gap-sm-0">
+                                <h5 class="text-danger mb-0 mb-sm-2 product-price">
+                                    @((item?.Gia ?? 0).ToString("N0"))<span class="small d-none d-sm-inline"> VNĐ</span><span class="small d-sm-none">đ</span>
+                                </h5>
+
+                                <div class="d-sm-none d-flex align-items-center">
+                                    @if (ratings.Any())
+                                    {
+                                        <span class="text-warning small me-1"><i class="bi bi-star-fill"></i></span>
+                                        <span class="small fw-bold">@avgRating.ToString("0.0")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small"><i class="bi bi-star"></i></span>
+                                    }
+                                </div>
+                            </div>
                             
                             @* data-id dùng để gửi ID lên Server *@
                             <button class="btn btn-primary btn-sm shadow-sm btn-add-to-cart rounded-circle d-sm-none"
@@ -91,6 +107,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         }
     </div>
 </div>
