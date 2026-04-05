@@ -27,7 +27,10 @@ html {
     min-width: 320px;
 }
 
-
+.navbar-brand{
+    color: #f5a26a !important;
+    font-weight: var(--fw-extra-bold);
+}
 
 h1 {
     font-family: var(--main-font);
@@ -118,10 +121,6 @@ h4, h5 {
 html {
     position: relative;
     min-height: 100%;
-}
-title{
-    color: var(--secondary-color);
-    font-weight: var(--fw-extra-bold);
 }
 
 header{

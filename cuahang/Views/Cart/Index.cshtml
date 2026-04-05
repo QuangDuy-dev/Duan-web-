@@ -1,5 +1,20 @@
 ﻿@model IEnumerable<cuahang.Models.CartItem>
 
+<style>
+    @@media (max-width: 767.98px) {
+        .mobile-cart-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .mobile-qty-input {
+            max-width: 70px;
+            text-align: center;
+        }
+    }
+</style>
+
 <div class="container mt-5">
     <h2 class="mb-4">Giỏ hàng của bạn</h2>
 
@@ -9,7 +24,8 @@
     }
     else
     {
-        <table class="table table-hover align-middle">
+        <div class="d-none d-md-block">
+            <table class="table table-hover align-middle">
             <thead class="table-light">
                 <tr>
                     <th>Sản phẩm</th>
@@ -48,18 +64,46 @@
                 }
             </tbody>
         </table>
+        </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-4">
-            <h4>
-                Tổng cộng:
-                <span class="text-danger" id="cart-grand-total">
+        <div class="d-md-none">
+            @foreach (var item in Model)
+            {
+                <div class="mobile-cart-item" id="mobile-row-@item?.SanPhamId">
+                    <img src="~/image/@(item?.ImageUrl ?? "default.jpg")"
+                         width="70" class="img-thumbnail me-3"
+                         onerror="this.src='/image/default.jpg'" />
+
+                    <div class="flex-grow-1">
+                        <div class="fw-bold mb-1">@(item?.TenSP ?? "N/A")</div>
+                        <div class="d-flex align-items-center">
+                            <input type="number" class="form-control form-control-sm mobile-qty-input quantity-input"
+                                   value="@(item?.SoLuong ?? 1)" min="1" data-id="@item?.SanPhamId"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <span class="ms-2 text-muted" style="font-size: 0.85rem;">x @((item?.Gia ?? 0).ToString("N0"))</span>
+                        </div>
+                    </div>
+
+                    <div class="ms-2">
+                        <button class="btn text-danger btn-remove" data-id="@item?.SanPhamId">
+                            <i class="bi bi-trash fs-4"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0">Tổng cộng:</h4>
+                <h4 class="text-danger fw-bold mb-0" id="cart-grand-total">
                     @((ViewBag.TongTien as decimal? ?? 0).ToString("N0")) VNĐ
-                </span>
-            </h4>
-            <div>
-                <a href="/" class="btn btn-secondary">Tiếp tục mua hàng</a>
+                </h4>
+            </div>
 
-                <a asp-controller="Cart" asp-action="Checkout" class="btn btn-success btn-lg">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="/" class="btn btn-secondary py-2 px-4">Tiếp tục mua hàng</a>
+                <a asp-controller="Cart" asp-action="Checkout" class="btn btn-success py-2 px-4">
                     Thanh toán ngay
                 </a>
             </div>
@@ -71,17 +115,17 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-
             // 1. Xử lý cập nhật số lượng khi thay đổi ô input
             $('.quantity-input').on('change keyup', function () {
                 var id = $(this).data('id');
                 var qty = $(this).val();
                 var row = $(this).closest('tr');
-
                 // Chặn trường hợp xóa hết số hoặc nhập số âm
                 if (qty === "" || qty < 1) {
                     return;
                 }
+                var dRow = $('#row-' + id);
+                var mRow = $('#mobile-row-' + id);
 
                 $.ajax({
                     url: '/Cart/UpdateQuantity',
@@ -91,25 +135,23 @@
                         if (response.success) {
                             // Cập nhật giá trị tổng của từng dòng
                             // Lưu ý: Đảm bảo Controller trả về đúng tên thuộc tính totalItemPrice
-                            row.find('.item-total').text(response.totalItemPrice + " VNĐ");
-
+                            dRow.find('.item-total').text(response.totalItemPrice + "đ");
                             // Cập nhật tổng cộng cuối trang
-                            $('#cart-grand-total').text(response.grandTotal + " VNĐ");
-
-                            if (typeof loadCartCount === "function") {
-                                loadCartCount();
-                            } else {
-                                $('#cart-count').text(response.cartCount);
-                            }
+                            $('#cart-grand-total').text(response.grandTotal + "đ");
+                            
+                            // Sync
+                            $('.quantity-input[data-id="'+id+'"]').val(qty);
+                        if (typeof loadCartCount === "function") {
+                            loadCartCount();
+                        } 
+                        else {
+                            $('#cart-count').text(response.cartCount);
                         }
-                    },
-                    error: function () {
-                        console.log("Lỗi hệ thống khi cập nhật số lượng.");
+                        }
                     }
                 });
             });
 
-            // 2. Xử lý xóa sản phẩm
             $('.btn-remove').click(function () {
                 var id = $(this).data('id');
                 var row = $(this).closest('tr');
@@ -121,8 +163,8 @@
                         data: { id: id },
                         success: function (response) {
                             if (response.success) {
-                                row.fadeOut(400, function () {
-                                    $(this).remove();
+                                // Fade out
+                                $('#row-' + id + ', #mobile-row-' + id).fadeOut(400, function() {
                                     location.reload();
                                 });
                             }
