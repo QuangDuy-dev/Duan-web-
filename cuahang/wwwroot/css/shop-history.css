@@ -1,0 +1,39 @@
+.table-nowrap th, 
+.table-nowrap td {
+    white-space: nowrap !important;
+    vertical-align: middle;
+    padding: 12px 8px;
+}
+
+.table-responsive-custom {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    min-width: 130px;
+}
+
+ .star-item:hover {
+        transform: scale(1.2);
+        color: #ffc107 !important;
+    }
+
+    .star-item {
+        transition: all 0.2s;
+        margin: 0 2px;
+    }
+
+.table-responsive-custom::-webkit-scrollbar {
+    height: 6px;
+}
+.table-responsive-custom::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 10px;
+}

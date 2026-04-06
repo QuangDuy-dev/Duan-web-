@@ -5,13 +5,15 @@
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
         <div class="col-md-8 text-center">
-            <div class="mb-4">
-                <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+            <div class="success-confirmation-header">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                </div>
+
+                <h2 class="fw-bold text-success mb-3">ĐẶT HÀNG THÀNH CÔNG!</h2>
             </div>
 
-            <h2 class="fw-bold text-success mb-3">ĐẶT HÀNG THÀNH CÔNG!</h2>
-
-            <div class="card shadow-sm border-0 p-4 bg-light">
+            <div class="card shadow-sm border-0 p-4 bg-light d-none d-md-block"
                 <p class="fs-5 lh-lg">
                     Cảm ơn <strong>@ViewBag.UserName</strong> đã tin tưởng và lựa chọn sử dụng dịch vụ của chúng tôi.
                     Sự hài lòng của quý khách chính là động lực để chúng tôi không ngừng cải thiện và mang đến những trải nghiệm tốt nhất.
@@ -31,6 +33,14 @@
 </div>
 
 <style>
+
+    .success-confirmation-header {
+        background: linear-gradient(135deg, rgba(62, 187, 128, 0.1) 0%, rgba(244, 255, 252, 0.5) ,rgba(162, 233, 184, 0.3) 100%);
+        border: 1px solid rgba(25, 135, 84, 0.2);
+        border-radius: 20px;
+        padding: 3rem 1rem;
+        margin-bottom: 2rem;
+    }
    
     .bi-check-circle-fill {
         animation: scaleUp 0.5s ease-out;

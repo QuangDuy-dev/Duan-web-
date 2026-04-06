@@ -4,14 +4,37 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    font-family: var(--main-font);
 }
 
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(to right, #cbd5e1, #a5b4fc);
+    background: linear-gradient(135deg, var(--primary-color), var(--background-color), var(--secondary-color)); 
+    min-height: 100vh;
 }
+
+.back-home {
+            position: fixed;
+            font: var(--main-font);
+            text-decoration: none;
+            top: 20px;
+            left: 20px;
+            padding: 8px 15px;
+            background-color: var(--background-color);
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: var(--fw-bold);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 1000;
+        }
+
+        .back-home:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            color: #fff;
+            transform: translateX(-3px);
+        }
 
 .container {
     display: flex;
@@ -30,6 +53,7 @@ body {
 
 h2 {
     font-size: 34px;
+    color: var(--primary-color);
     text-align: center;
     margin-bottom: 20px;
 }
@@ -42,18 +66,20 @@ input {
     border: none;
     outline: none;
     font-size: 16px;
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 20px;
+    transition: all 0.3s ease;
 }
 
 button {
     width: 100%;
     padding: 12px;
-    background: #7494ec;
+    background: var(--primary-color);
     border-radius: 6px;
     border: none;
     cursor: pointer;
     font-size: 16px;
+    font-weight: var(--fw-semibold);
     color: #fff;
     font-weight: 500;
     margin-bottom: 20px;
@@ -61,22 +87,31 @@ button {
 }
 
 button:hover {
-    background: #6884d3;
+    background: var(--secondary-color);
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--secondary-color);
 }
 
 p {
     font-size: 14.5px;
     text-align: center;
     margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+p .register-link{
+    color: var(--primary-color);
+    font-weight: var(--fw-semibold);
 }
 
 p a {
-     color: #7494ec;
-     text-decoration: none;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: var(--fw-bold);
 }
 
 p a:hover {
     text-decoration: underline;
+    color: var(--secondary-color);
 }
 
 .forgot-password-link {
@@ -84,13 +119,13 @@ p a:hover {
     margin-bottom: 15px;
 }
 
-.forgot-password-link a {
+.forgot-password-link a, .back-link{
     font-size: 0.9em;
-    color: #808080; 
+    color: var(--text-color);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: var(--fw-semibold);
 }
-.forgot-password-link a:hover {
+.forgot-password-link a:hover, .back-link:hover {
     text-decoration: underline;
-    color: #5a78d6;
+    color: var(--secondary-color);
 }

@@ -3,6 +3,8 @@
     ViewBag.Title = "Đơn hàng của tôi";
 }
 
+<link rel="stylesheet" href="~/css/shop-history.css" asp-append-version="true"/>
+
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-12">
@@ -17,8 +19,7 @@
                                 <tr>
                                     <th class="ps-4">Mã đơn</th>
                                     <th>Ngày mua</th>
-                                    
-                                    <th>Tổng tiền</th>
+                                    <th>Tổng tiền (đ)</th>
                                     <th>Trạng thái</th>
                                     <th class="text-center">Chi tiết</th>
                                 </tr>
@@ -30,16 +31,26 @@
                                             <td class="ps-4 fw-bold">#@item.Id</td>
                                             <td>@item.NgayDat.ToString("dd/MM/yyyy")</td>
                                           
-                                            <td class="text-danger fw-bold">@item.TongTien.ToString("N0") đ</td>
+                                            <td class="text-danger fw-bold">@item.TongTien.ToString("N0")</td>
                                             <td>
                                             @if (item.TrangThai == "Đang giao")
                                             {
                                                         <span class="badge rounded-pill bg-info text-dark">Đang giao</span>
                                             }
+                                            else if (item.TrangThai == "Hoàn thành")
+                                            {
+                                                        <span class="badge rounded-pill bg-success">@item.TrangThai</span>
+                                            }
+                                            else if (item.TrangThai == "Đã hủy")
+                                            {
+                                                        <span class="badge rounded-pill bg-danger">@item.TrangThai</span>
+                                            }
                                             else
                                             {
-                                                        <span class="badge rounded-pill bg-secondary">@item.TrangThai</span>
+                                                        <span class="badge rounded-pill bg-info text-dark">@item.TrangThai</span>
                                             }
+
+                                        
                                             </td>
                                                 <td class="text-center">
                                                     <a href="@Url.Action("ChiTietDonHang", "Account", new { id = item.Id })" class="btn btn-outline-primary btn-sm">

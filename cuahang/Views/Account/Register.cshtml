@@ -3,9 +3,18 @@
     Layout = null;
 }
 
-<link rel="stylesheet" href="~/css/login.css" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/login.css" asp-append-version="true"  />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
 
+<body>
+<a asp-controller="Home" asp-action="Index" class="back-home" title="Back to Home">&lt; </a>
 <div class="container">
     <div class="form-box active">
         <form asp-action="Register" method="post">
@@ -82,3 +91,4 @@
     password.onchange = validate;
     confirmPass.onkeyup = validate;
 </script>
+</body>
