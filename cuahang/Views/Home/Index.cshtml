@@ -2,6 +2,7 @@
 
 @{
     var keyword = Context.Request.Query["keyword"];
+    var currentType = ViewBag.CurrentType as string;
 }
 
 @if (Model == null || !Model.Any())
@@ -22,6 +23,48 @@
 
 <div class="container mt-5">
     <h2 class="text-center mb-4 text-uppercase fw-bold text-primary">Cửa Hàng Trực Tuyến</h2>
+    <div class="row mb-4 danh-muc">
+        <div class="col-12 text-center">
+            <div class="btn-group shadow-sm" role="group" aria-label="Product Categories">
+                @* Nút Tất cả *@
+                <a href="@Url.Action("Index", "Home", new { keyword = keyword })" 
+                   class="btn @(string.IsNullOrEmpty(currentType) ? "btn-primary" : "btn-outline-primary")">
+                    Tất cả
+                </a>
+
+                @* Nút Điện thoại *@
+                <a href="@(currentType == "1" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "1", keyword = keyword }))" 
+                   class="btn @(currentType == "1" ? "btn-primary" : "btn-outline-primary")">
+                    Điện thoại
+                </a>
+
+                @* Nút Phụ kiện *@
+                <a href="@(currentType == "2" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "2", keyword = keyword }))" 
+                   class="btn @(currentType == "2" ? "btn-primary" : "btn-outline-primary")">
+                    Phụ kiện
+                </a>
+
+                @if (ViewBag.DisplayBrands != null && ((List<dynamic>)ViewBag.DisplayBrands).Count > 0)
+            {
+                <div class="brand-container mt-4">
+                    @foreach (var b in ViewBag.DisplayBrands)
+                    {
+                        bool isActive = (ViewBag.CurrentBrand == b.Code);
+                        
+                        <a href="@Url.Action("Index", "Home", new { 
+                                keyword = keyword, 
+                                type = currentType, 
+                                brand = (isActive ? "" : b.Code) 
+                           })" 
+
+                           class="btn brand-card @(isActive ? "active" : "") p-0" title="@b.Name">
+                            <p> testing </p>
+                            @* <img src="~/image/brands/@(b.Code).png" alt="@b.Name"/> *@
+                        </a>
+                    }
+                </div>
+            }
+            </div>
 
     @if (!string.IsNullOrEmpty(keyword))
     {
