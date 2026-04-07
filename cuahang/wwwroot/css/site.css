@@ -316,6 +316,29 @@ body {
     height: 1.5rem;
 }
 
+.brand-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    border: var(--primary-color);
+}
+
+.brand-card img {
+    width: 130px; /* Adjust size as needed */
+    height: 60px;
+    object-fit: contain;
+    border: var(--primary-color);
+    border-radius: 8px;
+    padding: 5px;
+    background-color: white;
+}
+
+.brand-card.active img {
+    border: 2px solid;
+    border-color: var(--secondary-color);/* Highlight active brand */
+}
+
 @media (min-width: 768px) {
     html {
         font-size: 16px;

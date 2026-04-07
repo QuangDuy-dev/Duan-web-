@@ -23,7 +23,7 @@
 
 <div class="container mt-5">
     <h2 class="text-center mb-4 text-uppercase fw-bold text-primary">Cửa Hàng Trực Tuyến</h2>
-    <div class="row mb-4 danh-muc">
+    <div class="row mb-4">
         <div class="col-12 text-center">
             <div class="btn-group shadow-sm" role="group" aria-label="Product Categories">
                 @* Nút Tất cả *@
@@ -43,8 +43,9 @@
                    class="btn @(currentType == "2" ? "btn-primary" : "btn-outline-primary")">
                     Phụ kiện
                 </a>
+            </div>
 
-                @if (ViewBag.DisplayBrands != null && ((List<dynamic>)ViewBag.DisplayBrands).Count > 0)
+            @if (ViewBag.DisplayBrands != null && ((List<dynamic>)ViewBag.DisplayBrands).Count > 0)
             {
                 <div class="brand-container mt-4">
                     @foreach (var b in ViewBag.DisplayBrands)
@@ -57,14 +58,16 @@
                                 brand = (isActive ? "" : b.Code) 
                            })" 
 
-                           class="btn brand-card @(isActive ? "active" : "") p-0" title="@b.Name">
-                            <p> testing </p>
-                            @* <img src="~/image/brands/@(b.Code).png" alt="@b.Name"/> *@
+                           class="btn brand-card @(isActive ? "active" : "") p-0" title="@b.Code">
+                            @* <p> testing </p> *@
+                            <img src="~/image/brands/@(b.Name).png" alt="@b.Name" onerror="this.src='https://via.placeholder.com/50?text=@b.Name'" />
                         </a>
                     }
                 </div>
             }
-            </div>
+
+        </div>
+    </div>
 
     @if (!string.IsNullOrEmpty(keyword))
     {
