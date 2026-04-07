@@ -22,6 +22,10 @@
     --fw-extra-bold: 800;
 }
 
+* {
+    outline: 1px solid red !important;
+}
+
 html {
     font-size: 14px;
     min-width: 320px;
@@ -58,7 +62,7 @@ h4, h5 {
     border-radius: 4px;
 }
 
-.btn:hover {
+.btn:hover, .cat-pill:hover {
     color: white;
     background-color: var(--secondary-color);
     border-color: var(--secondary-color);
@@ -66,7 +70,7 @@ h4, h5 {
     transform: translateY(-1px);
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.cat-pill:active, .cat-pill:focus, .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     outline: none;
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--primary-color);
 }
@@ -94,6 +98,20 @@ h4, h5 {
     color: var(--secondary-color) !important;
     border-bottom: 2px solid var(--secondary-color);
     background-color: transparent !important; 
+}
+
+.category-bar {
+    width: 100%;
+    overflow-x: hidden; /* Prevents the bar from pushing the page wide */
+    position: relative;
+    z-index: 1000;
+}
+
+.category-scroll-wrapper {
+    display: flex;
+    overflow-x: auto; /* Only allow scrolling INSIDE this div */
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
 }
 
 .btn-primary, .btn-secondary, .btn-mobile-login {
@@ -151,8 +169,10 @@ body {
 
 .menu {
     position: fixed;
-    width: 280px;
-    height: 280px;
+    bottom: 10px;
+    right: 10px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -193,6 +213,11 @@ body {
     .menu .toggle:active {
         cursor: grabbing;
     }
+
+.menu.active{
+    width: 280px;
+    height: 280px;
+}
 
 .menu.active .toggle {
     transform: rotate(360deg);
@@ -345,8 +370,8 @@ body {
         gap: 6px;
         padding: 6px 16px;
         border-radius: 50px;
-        background-color: #f1f3f5;
-        color: #495057;
+        background-color: var(--background-color);
+        color: var(--primary-color);
         text-decoration: none;
         font-size: 0.85rem;
         font-weight: 500;
@@ -358,25 +383,13 @@ body {
         font-size: 1rem;
     }
 
-    .cat-pill:hover {
-        background-color: #e9ecef;
-        color: #0d6efd;
-    }
-
-    /* Active state */
-    .cat-pill.active {
-        background-color: #0d6efd;
-        color: #ffffff !important;
-        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
-    }
-
 @media (min-width: 768px) {
     html {
         font-size: 16px;
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .custom-mobile-row {
         margin-right: -5px;
         margin-left: -5px;
@@ -428,5 +441,11 @@ body {
         width: 32px;
         height: 32px;
         padding: 0;
+    }
+
+    .menu {
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
     }
 }

@@ -35,23 +35,23 @@
                 @* Nút Điện thoại *@
                 <a href="@(currentType == "1" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "1", keyword = keyword }))" 
                    class="btn @(currentType == "1" ? "btn-primary" : "btn-outline-primary")">
-                    Điện thoại
+                    <i class="bi bi-phone"></i> Điện thoại
                 </a>
 
                 @* Nút Phụ kiện *@
                 <a href="@(currentType == "2" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "2", keyword = keyword }))" 
                    class="btn @(currentType == "2" ? "btn-primary" : "btn-outline-primary")">
-                    Phụ kiện điện thoại
+                    <i class="bi bi-headset"> </i> Phụ kiện điện thoại
                 </a>
 
                 <a href="@(currentType == "4" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "4", keyword = keyword }))" 
                    class="btn @(currentType == "4" ? "btn-primary" : "btn-outline-primary")">
-                    Máy tính
+                    <i class="bi bi-laptop"> </i> Máy tính
                 </a>
 
                 <a href="@(currentType == "3" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "3", keyword = keyword }))" 
                    class="btn @(currentType == "3" ? "btn-primary" : "btn-outline-primary")">
-                    Phụ kiện máy tính
+                    <i class="bi bi-mouse3"> </i> Phụ kiện máy tính
                 </a>
 
             </div>
