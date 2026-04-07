@@ -11,7 +11,7 @@ namespace cuahang.Controllers
         private readonly ApplicationDbContext _db;
         public HomeController(ApplicationDbContext db) { _db = db; }
 
-        public IActionResult Index(string keyword, string type, string brand)
+        public async Task<IActionResult> Index(string keyword, string type, string brand)
         {
             var dsSanPham = _db.SanPham.Include(s => s.ChiTietHoaDons).AsQueryable();
             if (!string.IsNullOrEmpty(keyword))
@@ -52,31 +52,52 @@ namespace cuahang.Controllers
                 _db.SaveChanges();
             }
 
-            var brandGroups = new Dictionary<string, List<dynamic>>
-            {
-                { "1", new List<dynamic> { 
-                    new { Code = "ip", Name = "Apple" }, new { Code = "ss", Name = "Samsung" },
-                    new { Code = "xm", Name = "Xiaomi" }, new { Code = "nb", Name = "Nubia" },
-                    new { Code = "sn", Name = "Sony" }, new { Code = "vv", Name = "Vivo" },
-                    new { Code = "px", Name = "Pixel" }
-                }},
-                { "2", new List<dynamic> { 
-                    new { Code = "ss", Name = "Samsung" }, new { Code = "ak", Name = "Anker" },
-                    new { Code = "tc", Name = "Transcend" }, new { Code = "sd", Name = "Sandisk" },
-                    new { Code = "dji", Name = "DJI" }, new { Code = "ct", Name = "Cuktech" },
-                    new { Code = "atk", Name = "ATK" }, new { Code = "mad", Name = "MAD" },
-                    new { Code = "rz", Name = "Razer" }, new { Code = "cs", Name = "Corsair" },
-                    new { Code = "ip", Name = "Apple" }, new { Code = "lg", Name = "LG" },
-                    new { Code = "asus", Name = "Asus" }, new { Code = "lenovo", Name = "Lenovo" },
-                    new { Code = "msi", Name = "MSI" }, new { Code = "sn", Name = "Sony" }
-                }}
-            };
+            // 1. Get unique LoaiSp strings directly from the database
+            var uniqueLoaiStrings = await _db.SanPham
+                .Select(s => s.LoaiSp)
+                .Distinct()
+                .ToListAsync();
 
-            ViewBag.DisplayBrands = !string.IsNullOrEmpty(type) && brandGroups.ContainsKey(type) ? brandGroups[type] : new List<dynamic>();
+            // 2. Transform the strings (e.g., "1 ip") into a grouped Dictionary
+            var brandGroups = uniqueLoaiStrings
+                .Where(l => !string.IsNullOrWhiteSpace(l) && l.Contains(" "))
+                .Select(l => 
+                {
+                    var parts = l.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    return new { CatId = parts[0], Code = parts[1] };
+                })
+                .GroupBy(x => x.CatId)
+                .ToDictionary(
+                    g => g.Key, 
+                    g => g.Select(x => (dynamic)new 
+                    { 
+                        Code = x.Code, 
+                        Name = GetBrandDisplayName(x.Code) 
+                    }).ToList()
+                );
+
+            ViewBag.DisplayBrands = !string.IsNullOrEmpty(type) && brandGroups.ContainsKey(type) 
+                                    ? brandGroups[type] 
+                                    : new List<dynamic>();
             ViewBag.CurrentType = type;
             ViewBag.CurrentBrand = brand;
-            return View(dsSanPham.ToList());
+            return View(await dsSanPham.ToListAsync());
             
+        }
+
+        private string GetBrandDisplayName(string code)
+        {
+            return code.ToLower() switch
+            {
+                "ss" => "Samsung", "msi" => "MSI", "lenovo" => "Lenovo",
+                "xm" => "Xiaomi", "lg"=>"LG", "asus" => "Asus",
+                "sn" => "Sony", "rz" => "Razer", "cs"=> "Corsair",
+                "ak" => "Anker", "mad" => "Madlions", "ip" => "Apple",
+                "nb" => "Nubia", "ct" =>"Cuktech", "atk" => "Atk",
+                "vv" => "Vivo", "sd" => "SanDisk", "dji" => "DJI", 
+                "px" => "Pixel", "tc" => "Transcend",
+                _=> char.ToUpper(code[0]) + code.Substring(1)
+            };
         }
 
         public IActionResult Privacy()

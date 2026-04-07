@@ -1,5 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var currentType = Context.Request.Query["type"].ToString();
+    var currentKeyword = Context.Request.Query["keyword"].ToString();
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -166,7 +172,46 @@
                     </div>
                 </div>
             </div>
-        </nav>
+
+            <div class="category-bar">
+    <div class="container">
+        <div class="category-scroll-wrapper text-white">
+            @* 1. All Products *@
+            <a href="@Url.Action("Index", "Home", new { keyword = currentKeyword })" 
+               class="cat-pill @(string.IsNullOrEmpty(currentType) ? "active" : "")">
+                <i class="bi bi-house-door"></i> Tất cả
+            </a>
+
+            @* 2. Category 1 *@
+            <a href="@Url.Action("Index", "Home", new { type = "1", keyword = currentKeyword })" 
+               class="cat-pill @(currentType == "1" ? "active" : "")">
+                <i class="bi bi-phone"></i> Điện thoại
+            </a>
+
+            @* 3. Category 2 *@
+            <a href="@Url.Action("Index", "Home", new { type = "2", keyword = currentKeyword })" 
+               class="cat-pill @(currentType == "2" ? "active" : "")">
+                <i class="bi bi-headset"></i> Phụ kiện ĐT
+            </a>
+
+            @* 4. Category 4 *@
+            <a href="@Url.Action("Index", "Home", new { type = "4", keyword = currentKeyword })" 
+               class="cat-pill @(currentType == "4" ? "active" : "")">
+                <i class="bi bi-laptop"></i> Máy tính
+            </a>
+
+            @* 5. Category 3 *@
+            <a href="@Url.Action("Index", "Home", new { type = "3", keyword = currentKeyword })" 
+                class="cat-pill @(currentType == "3" ? "active" : "")">
+                <i class="bi bi-mouse3"></i> Phụ kiện MT
+            </a>
+            </div>
+        </div>
+    </div>
+    </nav>
+
+    </div>
+
     </header>
 
     <div class="container">

@@ -339,6 +339,37 @@ body {
     border-color: var(--secondary-color);/* Highlight active brand */
 }
 
+.cat-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 16px;
+        border-radius: 50px;
+        background-color: #f1f3f5;
+        color: #495057;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .cat-pill i {
+        font-size: 1rem;
+    }
+
+    .cat-pill:hover {
+        background-color: #e9ecef;
+        color: #0d6efd;
+    }
+
+    /* Active state */
+    .cat-pill.active {
+        background-color: #0d6efd;
+        color: #ffffff !important;
+        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+    }
+
 @media (min-width: 768px) {
     html {
         font-size: 16px;

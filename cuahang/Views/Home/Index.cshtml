@@ -41,8 +41,19 @@
                 @* Nút Phụ kiện *@
                 <a href="@(currentType == "2" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "2", keyword = keyword }))" 
                    class="btn @(currentType == "2" ? "btn-primary" : "btn-outline-primary")">
-                    Phụ kiện
+                    Phụ kiện điện thoại
                 </a>
+
+                <a href="@(currentType == "4" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "4", keyword = keyword }))" 
+                   class="btn @(currentType == "4" ? "btn-primary" : "btn-outline-primary")">
+                    Máy tính
+                </a>
+
+                <a href="@(currentType == "3" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "3", keyword = keyword }))" 
+                   class="btn @(currentType == "3" ? "btn-primary" : "btn-outline-primary")">
+                    Phụ kiện máy tính
+                </a>
+
             </div>
 
             @if (ViewBag.DisplayBrands != null && ((List<dynamic>)ViewBag.DisplayBrands).Count > 0)
@@ -59,7 +70,6 @@
                            })" 
 
                            class="btn brand-card @(isActive ? "active" : "") p-0" title="@b.Code">
-                            @* <p> testing </p> *@
                             <img src="~/image/brands/@(b.Name).png" alt="@b.Name" onerror="this.src='https://via.placeholder.com/50?text=@b.Name'" />
                         </a>
                     }
