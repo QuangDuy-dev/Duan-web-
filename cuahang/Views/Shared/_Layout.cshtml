@@ -1,5 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var currentType = Context.Request.Query["type"].ToString();
+    var currentKeyword = Context.Request.Query["keyword"].ToString();
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,6 +83,32 @@
                                 <i class="bi bi-cart3"></i>
                             </button>
                         }
+                    </div>
+
+                    <div class="category-bar mt-2 mb-3">
+                        <div class="container px-0">
+                            <div class="category-scroll-wrapper text-white">
+                                <a href="@Url.Action("Index", "Home", new { type = "1", keyword = currentKeyword })" 
+                                    class="cat-pill @(currentType == "1" ? "active" : "")">
+                                    <i class="bi bi-phone"></i> Điện thoại
+                                </a>
+
+                                <a href="@Url.Action("Index", "Home", new { type = "2", keyword = currentKeyword })" 
+                                    class="cat-pill @(currentType == "2" ? "active" : "")">
+                                    <i class="bi bi-headset"></i> Phụ kiện ĐT
+                                </a>
+
+                                <a href="@Url.Action("Index", "Home", new { type = "4", keyword = currentKeyword })" 
+                                    class="cat-pill @(currentType == "4" ? "active" : "")">
+                                    <i class="bi bi-laptop"></i> Máy tính
+                                </a>
+
+                                <a href="@Url.Action("Index", "Home", new { type = "3", keyword = currentKeyword })" 
+                                    class="cat-pill @(currentType == "3" ? "active" : "")">
+                                <i class="bi bi-mouse3"></i> Phụ kiện MT
+                                </a>
+                            </div>
+                        </div>
                     </div>
 
                     <ul class="navbar-nav flex-grow-1">
@@ -166,6 +198,34 @@
                     </div>
                 </div>
             </div>
+
+            @if (ViewContext.RouteData.Values["controller"]?.ToString() != "Home" || 
+                 ViewContext.RouteData.Values["action"]?.ToString() != "Index")
+            {<div class="category-bar">
+                <div class="container">
+                    <div class="category-scroll-wrapper text-white">
+                        <a href="@Url.Action("Index", "Home", new { type = "1", keyword = currentKeyword })" 
+                            class="cat-pill @(currentType == "1" ? "active" : "")">
+                            <i class="bi bi-phone"></i> Điện thoại
+                        </a>
+
+                        <a href="@Url.Action("Index", "Home", new { type = "2", keyword = currentKeyword })" 
+                            class="cat-pill @(currentType == "2" ? "active" : "")">
+                            <i class="bi bi-headset"></i> Phụ kiện ĐT
+                        </a>
+
+                        <a href="@Url.Action("Index", "Home", new { type = "4", keyword = currentKeyword })" 
+                            class="cat-pill @(currentType == "4" ? "active" : "")">
+                            <i class="bi bi-laptop"></i> Máy tính
+                        </a>
+
+                        <a href="@Url.Action("Index", "Home", new { type = "3", keyword = currentKeyword })" 
+                            class="cat-pill @(currentType == "3" ? "active" : "")">
+                        <i class="bi bi-mouse3"></i> Phụ kiện MT
+                        </a>
+                    </div>
+                </div>
+            </div>}
         </nav>
     </header>
 
@@ -249,19 +309,23 @@
             Chúng tôi ở đây với sứ mệnh đưa các sản phẩm giá rẻ nhất thị trường và chất lượng đỉnh cao cho các bạn
           </p>
         </div>
-        <div class="d-none d-md-block col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+        <div class="d-none d-md-block col-md-2 col-lg-2 col-xl-2 mx-auto mb-4 text-dark text-decoration-none">
             <h6 class="text-uppercase fw-bold mb-3 mb-md-4">Products</h6>
-          <p>
-            <a href="#!" class="text-reset">Điện thoại</a>
+          <p class="text-dark text-decoration-none">
+            <a href="@Url.Action("Index", "Home", new { type = "1", keyword = currentKeyword })">
+            <i class="bi bi-phone"></i> Điện thoại</a>
           </p>
-          <p>
-            <a href="#!" class="text-reset">Tai nghe</a>
+          <p class="text-dark text-decoration-none">
+            <a href="@Url.Action("Index", "Home", new { type = "2", keyword = currentKeyword })">
+            <i class="bi bi-headset"></i> Phụ kiện ĐT</a>
           </p>
-          <p>
-            <a href="#!" class="text-reset">Linh kiện</a>
+          <p class="text-dark text-decoration-none">
+            <a href="@Url.Action("Index", "Home", new { type = "4", keyword = currentKeyword })">
+            <i class="bi bi-laptop"></i> Máy tính</a>
           </p>
-          <p>
-            <a href="#!" class="text-reset">Phụ kiện </a>
+          <p class="text-dark text-decoration-none">
+            <a href="@Url.Action("Index", "Home", new { type = "3", keyword = currentKeyword })">
+            <i class="bi bi-mouse3"></i> Phụ kiện MT</a>
           </p>
         </div>
         <div class="d-none d-md-block col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
