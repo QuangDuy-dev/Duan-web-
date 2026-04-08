@@ -1,0 +1,104 @@
+@model cuahang.Models.SanPham
+
+@{
+    ViewData["Title"] = Model.TenSP;
+
+    // Calculate Average Rating (Consistent with your Index logic)
+    var ratings = Model.ChiTietHoaDons?.Where(c => c.DiemDanhGia > 0).ToList() 
+                  ?? new List<cuahang.Models.ChiTietHoaDon>();
+    double avgRating = ratings.Any() ? ratings.Average(c => c.DiemDanhGia.Value) : 0;
+}
+
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Cửa hàng</a></li>
+            <li class="breadcrumb-item active">@Model.TenSP</li>
+        </ol>
+    </nav>
+
+    <div class="row bg-white p-4 shadow-sm rounded">
+        <div class="col-md-5 text-center">
+            <img src="~/image/@(Model.ImageUrl ?? "default.jpg")" 
+                 class="img-fluid rounded product-img-detail" 
+                 alt="@Model.TenSP"
+                 onerror="this.src='https://via.placeholder.com/400?text=No+Image'"
+                 style="max-height: 400px; object-fit: contain;">
+        </div>
+
+        <div class="col-md-7">
+            @if (!string.IsNullOrEmpty(ViewBag.BrandCode))
+            {
+                <div class="mb-2">
+                    <img src="~/image/brands/@(ViewBag.BrandName).png" 
+                         alt="@ViewBag.BrandName" 
+                         style="height: 30px;" 
+                         onerror="this.style.display='none'" />
+                    <span class="text-muted ms-1 small">Thương hiệu: <strong>@ViewBag.BrandName</strong></span>
+                </div>
+            }
+
+            <h2 class="fw-bold">@Model.TenSP</h2>
+
+            <div class="mb-3">
+                @if (ratings.Any())
+                {
+                    <span class="text-warning fs-5">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= Math.Round(avgRating))
+                            {
+                                <i class="bi bi-star-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-star text-secondary"></i>
+                            }
+                        }
+                    </span>
+                    <span class="ms-2 fw-bold">@avgRating.ToString("0.0")</span>
+                    <span class="text-muted small">(@ratings.Count lượt đánh giá)</span>
+                }
+                else
+                {
+                    <span class="text-muted italic small">Chưa có đánh giá</span>
+                }
+            </div>
+
+            <h3 class="text-danger fw-bold mb-4">@Model.Gia.ToString("N0") VNĐ</h3>
+
+            <div class="card bg-light border-0 mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold">Mô tả sản phẩm:</h6>
+                    <p class="card-text text-muted">@Model.MoTa</p>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <p><strong>Trạng thái:</strong> 
+                    @if (Model.SoLuongTon > 0) {
+                        <span class="badge bg-success">Còn @Model.SoLuongTon sản phẩm</span>
+                    } else {
+                        <span class="badge bg-danger">Hết hàng</span>
+                    }
+                </p>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex">
+                <button class="btn btn-primary btn-lg px-5 btn-add-to-cart" data-id="@Model.Id">
+                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Quay lại</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-img-detail {
+        transition: transform .3s;
+    }
+    .product-img-detail:hover {
+        transform: scale(1.05);
+    }
+</style>

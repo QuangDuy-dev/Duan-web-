@@ -124,11 +124,13 @@
             <div class="col-6 col-md-4 col-lg-3 mb-3 mb-md-4">
                 <div class="card h-100 shadow-sm border-0 product-card">
                     <div class="text-center p-2 p-sm-3">
+                        <a href="@Url.Action("Details", "Home", new { id = item.Id })" class="text-decoration-none text-dark">
                         <img src="~/image/@(item?.ImageUrl ?? "default.jpg")"
                             style="max-height: 200px; object-fit: contain;"
                             class="card-img-top img-fluid product-img"
                             alt="@(item?.TenSP ?? "Sản phẩm")"
                             onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                            </a>
                     </div>
 
                     <div class="card-body d-flex flex-column p-2 p-sm-3">
@@ -193,6 +195,7 @@
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
         }

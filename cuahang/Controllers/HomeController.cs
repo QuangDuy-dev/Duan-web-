@@ -121,5 +121,32 @@ namespace cuahang.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public async Task<IActionResult> Details(int? id)
+{
+    if (id == null) return NotFound();
+
+    // Include ChiTietHoaDons to calculate ratings
+    var sanPham = await _db.SanPham
+        .Include(s => s.ChiTietHoaDons)
+        .FirstOrDefaultAsync(m => m.Id == id);
+
+    if (sanPham == null) return NotFound();
+
+    // Brand Logic
+    string brandName = "";
+    string brandCode = "";
+    if (!string.IsNullOrEmpty(sanPham.LoaiSp) && sanPham.LoaiSp.Contains(" "))
+    {
+        var parts = sanPham.LoaiSp.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        brandCode = parts[1];
+        brandName = GetBrandDisplayName(brandCode);
     }
+
+    ViewBag.BrandName = brandName;
+    ViewBag.BrandCode = brandCode;
+
+    return View(sanPham);
+}
+}
 }
