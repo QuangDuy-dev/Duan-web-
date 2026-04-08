@@ -134,3 +134,40 @@ function openCallModal(number) {
         modal.classList.remove('active');
     };
 }
+
+function updateDualSlider() {
+            const minInput = document.getElementById('minPriceInput');
+            const maxInput = document.getElementById('maxPriceInput');
+            const minLabel = document.getElementById('minPriceLabel');
+            const maxLabel = document.getElementById('maxPriceLabel');
+            const fill = document.getElementById('sliderFill');
+            
+            const maxLimit = parseInt(minInput.max);
+            let minVal = parseInt(minInput.value);
+            let maxVal = parseInt(maxInput.value);
+
+            // 1. Force min and max to stay on their respective sides
+            if (minVal > maxVal) {
+                // If they cross, swap values or push them
+                let temp = minVal;
+                minVal = maxVal;
+                maxVal = temp;
+            }
+
+            // 2. Update Labels (Formatting with dots)
+            minLabel.innerText = minVal.toLocaleString('vi-VN');
+            maxLabel.innerText = maxVal.toLocaleString('vi-VN');
+
+            // 3. Update the Blue Fill Bar
+            // Calculate percentage positions
+            const percentMin = (minVal / maxLimit) * 100;
+            const percentMax = (maxVal / maxLimit) * 100;
+
+            fill.style.left = percentMin + "%";
+            fill.style.width = (percentMax - percentMin) + "%";
+        }
+
+        // Initialize on page load
+        $(document).ready(function() {
+            updateDualSlider();
+        });

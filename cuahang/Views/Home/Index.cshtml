@@ -23,7 +23,7 @@
 
 <div class="container mt-5">
     <h2 class="text-center mb-4 text-uppercase fw-bold text-primary">Cửa Hàng Trực Tuyến</h2>
-    <div class="row mb-4">
+    <div class="row mb-4 d-none d-md-flex">
         <div class="col-12 text-center">
             <div class="btn-group shadow-sm" role="group" aria-label="Product Categories">
                 @* Nút Tất cả *@
@@ -32,28 +32,25 @@
                     Tất cả
                 </a>
 
-                @* Nút Điện thoại *@
-                <a href="@(currentType == "1" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "1", keyword = keyword }))" 
+                <a href="@(currentType == "1" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "1", keyword = keyword, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, }))" 
                    class="btn @(currentType == "1" ? "btn-primary" : "btn-outline-primary")">
                     <i class="bi bi-phone"></i> Điện thoại
                 </a>
 
-                @* Nút Phụ kiện *@
-                <a href="@(currentType == "2" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "2", keyword = keyword }))" 
+                <a href="@(currentType == "2" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "2", keyword = keyword, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, }))" 
                    class="btn @(currentType == "2" ? "btn-primary" : "btn-outline-primary")">
                     <i class="bi bi-headset"> </i> Phụ kiện điện thoại
                 </a>
 
-                <a href="@(currentType == "4" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "4", keyword = keyword }))" 
+                <a href="@(currentType == "4" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "4", keyword = keyword, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, }))" 
                    class="btn @(currentType == "4" ? "btn-primary" : "btn-outline-primary")">
                     <i class="bi bi-laptop"> </i> Máy tính
                 </a>
 
-                <a href="@(currentType == "3" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "3", keyword = keyword }))" 
+                <a href="@(currentType == "3" ? Url.Action("Index", "Home", new { keyword = keyword }) : Url.Action("Index", "Home", new { type = "3", keyword = keyword, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, }))" 
                    class="btn @(currentType == "3" ? "btn-primary" : "btn-outline-primary")">
                     <i class="bi bi-mouse3"> </i> Phụ kiện máy tính
                 </a>
-
             </div>
 
             @if (ViewBag.DisplayBrands != null && ((List<dynamic>)ViewBag.DisplayBrands).Count > 0)
@@ -66,7 +63,8 @@
                         <a href="@Url.Action("Index", "Home", new { 
                                 keyword = keyword, 
                                 type = currentType, 
-                                brand = (isActive ? "" : b.Code) 
+                                brand = (isActive ? "" : b.Code),
+                                minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice
                            })" 
 
                            class="btn brand-card @(isActive ? "active" : "") p-0" title="@b.Code">
@@ -75,9 +73,42 @@
                     }
                 </div>
             }
+            
+            <div class="mt-4 d-none d-md-block mx-auto border p-3 rounded shadow-sm bg-light" style="max-width: 500px;">
+                <form method="get" action="@Url.Action("Index", "Home")">
+                    <input type="hidden" name="keyword" value="@keyword" />
+                    <input type="hidden" name="type" value="@ViewBag.CurrentType" />
+                    <input type="hidden" name="brand" value="@ViewBag.CurrentBrand" />
 
+                <div class="range-slider-container">
+                    <div class="slider-track"></div>
+                    <div id="sliderFill" class="slider-fill"></div>
+
+                    <input type="range" name="minPrice" id="minPriceInput" 
+                        min="0" max="@ViewBag.MaxDbPrice" step="100000" 
+                        value="@ViewBag.MinPrice" oninput="updateDualSlider()">
+            
+                    <input type="range" name="maxPrice" id="maxPriceInput" 
+                        min="0" max="@ViewBag.MaxDbPrice" step="100000" 
+                        value="@ViewBag.MaxPrice" oninput="updateDualSlider()">
+                </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <div class="price-badge bg-white border rounded px-2 py-1 small">
+                        <span id="minPriceLabel">0</span>đ
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm fw-bold" style="white-space: nowrap;">Áp dụng</button>
+
+                    <div class="price-badge bg-white border rounded px-2 py-1 small">
+                        <span id="maxPriceLabel">0</span>đ
+                    </div>
+                </div>
+            </form>
+            </div>
         </div>
     </div>
+</div>
 
     @if (!string.IsNullOrEmpty(keyword))
     {

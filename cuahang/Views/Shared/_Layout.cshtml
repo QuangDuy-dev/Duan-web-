@@ -85,6 +85,32 @@
                         }
                     </div>
 
+                    <div class="category-bar mt-2 mb-3">
+                        <div class="container px-0">
+                            <div class="category-scroll-wrapper text-white">
+                                <a href="@Url.Action("Index", "Home", new { type = "1", keyword = currentKeyword })" 
+                                    class="cat-pill @(currentType == "1" ? "active" : "")">
+                                    <i class="bi bi-phone"></i> Điện thoại
+                                </a>
+
+                                <a href="@Url.Action("Index", "Home", new { type = "2", keyword = currentKeyword })" 
+                                    class="cat-pill @(currentType == "2" ? "active" : "")">
+                                    <i class="bi bi-headset"></i> Phụ kiện ĐT
+                                </a>
+
+                                <a href="@Url.Action("Index", "Home", new { type = "4", keyword = currentKeyword })" 
+                                    class="cat-pill @(currentType == "4" ? "active" : "")">
+                                    <i class="bi bi-laptop"></i> Máy tính
+                                </a>
+
+                                <a href="@Url.Action("Index", "Home", new { type = "3", keyword = currentKeyword })" 
+                                    class="cat-pill @(currentType == "3" ? "active" : "")">
+                                <i class="bi bi-mouse3"></i> Phụ kiện MT
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Trang chủ</a>

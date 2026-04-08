@@ -11,23 +11,33 @@ namespace cuahang.Controllers
         private readonly ApplicationDbContext _db;
         public HomeController(ApplicationDbContext db) { _db = db; }
 
-        public async Task<IActionResult> Index(string keyword, string type, string brand)
+        public async Task<IActionResult> Index(string keyword, string type, string brand, decimal? minPrice, decimal? maxPrice)
         {
+            
             var dsSanPham = _db.SanPham.Include(s => s.ChiTietHoaDons).AsQueryable();
+
+            if (minPrice.HasValue)
+            {
+                dsSanPham = dsSanPham.Where(p => p.Gia >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                dsSanPham = dsSanPham.Where(p => p.Gia <= maxPrice.Value);
+            }
+
             if (!string.IsNullOrEmpty(keyword))
             {
                 dsSanPham = dsSanPham.Where(p => p.TenSP.Contains(keyword));
             }
+
             if (!string.IsNullOrEmpty(type))
             {
                 dsSanPham = dsSanPham.Where(p => p.LoaiSp.StartsWith(type));
             }
-
             if (!string.IsNullOrEmpty(brand))
             {
                 dsSanPham = dsSanPham.Where(p => p.LoaiSp.EndsWith(" " + brand));
             }
-
 
             if (!_db.SanPham.Any())
             {
@@ -52,13 +62,12 @@ namespace cuahang.Controllers
                 _db.SaveChanges();
             }
 
-            // 1. Get unique LoaiSp strings directly from the database
+            // Get unique LoaiSp
             var uniqueLoaiStrings = await _db.SanPham
                 .Select(s => s.LoaiSp)
                 .Distinct()
                 .ToListAsync();
 
-            // 2. Transform the strings (e.g., "1 ip") into a grouped Dictionary
             var brandGroups = uniqueLoaiStrings
                 .Where(l => !string.IsNullOrWhiteSpace(l) && l.Contains(" "))
                 .Select(l => 
@@ -75,16 +84,18 @@ namespace cuahang.Controllers
                         Name = GetBrandDisplayName(x.Code) 
                     }).ToList()
                 );
-
+            decimal maxDbPrice = await _db.SanPham.AnyAsync() ? await _db.SanPham.MaxAsync(p => p.Gia) : 50000000;
             ViewBag.DisplayBrands = !string.IsNullOrEmpty(type) && brandGroups.ContainsKey(type) 
                                     ? brandGroups[type] 
                                     : new List<dynamic>();
             ViewBag.CurrentType = type;
             ViewBag.CurrentBrand = brand;
+            ViewBag.MinPrice = minPrice ?? 0;
+            ViewBag.MaxPrice = maxPrice ?? maxDbPrice;
+            ViewBag.MaxDbPrice = maxDbPrice;
             return View(await dsSanPham.ToListAsync());
             
         }
-
         private string GetBrandDisplayName(string code)
         {
             return code.ToLower() switch
