@@ -2,21 +2,13 @@
 
 @{
     ViewData["Title"] = Model.TenSP;
-
-    // Calculate Average Rating (Consistent with your Index logic)
     var ratings = Model.ChiTietHoaDons?.Where(c => c.DiemDanhGia > 0).ToList() 
                   ?? new List<cuahang.Models.ChiTietHoaDon>();
     double avgRating = ratings.Any() ? ratings.Average(c => c.DiemDanhGia.Value) : 0;
 }
 
 <div class="container mt-5">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-action="Index">Cửa hàng</a></li>
-            <li class="breadcrumb-item active">@Model.TenSP</li>
-        </ol>
-    </nav>
-
+    <a asp-controller="Home" asp-action="Index" class="back-home" title="Back to Home">&lt; </a>
     <div class="row bg-white p-4 shadow-sm rounded">
         <div class="col-md-5 text-center">
             <img src="~/image/@(Model.ImageUrl ?? "default.jpg")" 
@@ -30,11 +22,13 @@
             @if (!string.IsNullOrEmpty(ViewBag.BrandCode))
             {
                 <div class="mb-2">
+                    <a href="@Url.Action("Index", "Home", new { brand = ViewBag.BrandCode })" class="text-decoration-none">
                     <img src="~/image/brands/@(ViewBag.BrandName).png" 
                          alt="@ViewBag.BrandName" 
                          style="height: 30px;" 
                          onerror="this.style.display='none'" />
                     <span class="text-muted ms-1 small">Thương hiệu: <strong>@ViewBag.BrandName</strong></span>
+                    </a>
                 </div>
             }
 
@@ -57,15 +51,21 @@
                         }
                     </span>
                     <span class="ms-2 fw-bold">@avgRating.ToString("0.0")</span>
-                    <span class="text-muted small">(@ratings.Count lượt đánh giá)</span>
+                    <span class="text-muted small">(@ratings.Count Đánh giá)</span>
                 }
                 else
                 {
                     <span class="text-muted italic small">Chưa có đánh giá</span>
                 }
             </div>
-
-            <h3 class="text-danger fw-bold mb-4">@Model.Gia.ToString("N0") VNĐ</h3>
+            
+            <div class="d-inline-flex align-items-center justify-content-start gap-2 mb-2">
+                <h3 class="text-danger fw-bold m-0 p-0">@Model.Gia.ToString("N0") đ</h3>
+                <button class="btn btn-primary btn-sm shadow-sm btn-add-to-cart d-sm-none"
+                        data-id="@Model.Id">
+                        <i class="bi bi-cart-plus"></i>
+                </button>
+            </div>
 
             <div class="card bg-light border-0 mb-4">
                 <div class="card-body">
@@ -83,12 +83,16 @@
                     }
                 </p>
             </div>
-
-            <div class="d-grid gap-2 d-md-flex">
-                <button class="btn btn-primary btn-lg px-5 btn-add-to-cart" data-id="@Model.Id">
-                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
-                </button>
-                <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Quay lại</a>
+            <div class="row g-2">
+                <div class="col-6">
+                        <button class="btn btn-primary w-100 shadow-sm btn-add-to-cart d-none d-sm-block"
+                            data-id="@Model.Id">
+                            <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                        </button>
+                </div>
+                <div class="col-6">
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100 shadow-sm d-flex align-items-center justify-content-center d-none d-sm-block">Quay lại</a>
+                </div>
             </div>
         </div>
     </div>
@@ -101,4 +105,50 @@
     .product-img-detail:hover {
         transform: scale(1.05);
     }
+@@media (max-width: 767px){
+    .product-img-detail {
+        max-height: 250px;
+        width: auto;
+        object-fit: contain;
+    }
+}
 </style>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.btn-add-to-cart').off('click').on('click', function() {
+                // --- LOGIC KIỂM TRA ĐĂNG NHẬP ---
+                var userLevel = '@Context.Session.GetString("UserLevel")';
+
+                if (!userLevel || userLevel === "") {
+                    alert("Vui lòng đăng nhập để thực hiện chức năng thêm vào giỏ hàng!");
+                    // Chuyển hướng người dùng đến trang đăng nhập (kiểm tra lại đường dẫn này)
+                    window.location.href = "/Account/Login";
+                    return; // Ngừng thực hiện các lệnh bên dưới
+                }
+                // --------------------------------
+
+                var productId = $(this).data('id');
+
+                $.ajax({
+                    url: '/Cart/AddToCart',
+                    type: 'POST',
+                    data: { id: productId },
+                    success: function(response) {
+                        if(response.success) {
+                            alert("Đã thêm \"" + response.productName + "\" vào giỏ hàng thành công!");
+                            location.reload();
+                        } else {
+                            alert("Lỗi: " + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert("Không thể kết nối với máy chủ. Vui lòng kiểm tra lại SQL Server!");
+                    }
+                });
+            });
+        });
+    </script>
+}
