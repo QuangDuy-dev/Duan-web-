@@ -15,26 +15,26 @@ body {
 }
 
 .back-home {
-            position: fixed;
-            font: var(--main-font);
-            text-decoration: none;
-            top: 20px;
-            left: 20px;
-            padding: 8px 15px;
-            background-color: var(--background-color);
-            border-radius: 4px;
-            font-size: 18px;
-            font-weight: var(--fw-bold);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            z-index: 1000;
-        }
+    position: fixed;
+    font: var(--main-font);
+    text-decoration: none;
+    top: 20px;
+    left: 20px;
+    padding: 8px 15px;
+    background-color: var(--background-color);
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: var(--fw-bold);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 1000;
+}
 
-        .back-home:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-            color: #fff;
-            transform: translateX(-3px);
-        }
+.back-home:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+    color: #fff;
+    transform: translateX(-3px);
+}
 
 .container {
     display: flex;
